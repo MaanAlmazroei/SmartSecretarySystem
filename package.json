@@ -1,5 +1,5 @@
 {
-  "homepage":"https://MaanAlmazroei.github.io/SmartSecretarySystem",
+  "homepage": "https://MaanAlmazroei.github.io/SmartSecretarySystem",
   "name": "smart-secretary-system",
   "version": "0.1.0",
   "private": true,
@@ -11,13 +11,15 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.4.0",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "react-scripts": "^5.0.1",
+    "web-vitals": "^2.1.4",
+    "webpack": "^5.98.0",
+    "webpack-dev-server": "^5.2.1"
   },
   "scripts": {
     "start": "react-scripts start",
-    "predeploy":"npm run build",
-    "deploy":"gh-pages -d build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
