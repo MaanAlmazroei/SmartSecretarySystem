@@ -1,188 +1,103 @@
-/* ======================== */
-/* Header Styling */
-/* ======================== */
-header {
-  display: flex; /* Aligns items in a row */
-  position: sticky;
-  top: 0;
-  justify-content: space-between; /* Spaces elements apart */
-  align-items: center; /* Centers items vertically */
-  padding: 10px 20px; /* Adds spacing around header */
-  background-color: white; /* Keeps it clean */
-  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.1); /* Adds shadow for depth */
-}
-
-/* ======================== */
-/* Logo Styling */
-/* ======================== */
-
-.logo img {
-  width: 80px; /* Adjusts logo size */
-  padding-left: 15px;
-}
-
-/* ======================== */
-/* Navigation Bar Styling */
-/* ======================== */
-nav {
-  display: flex; /* Aligns items in a row */
-  align-items: center; /* Centers items vertically */
-  width: 100%; /* Ensures full width */
-}
-
-/* Centers navigation links */
-.nav-center {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-/* Navigation list styling */
-nav ul {
-  list-style: none; /* Removes bullet points */
-  display: flex; /* Aligns items in a row */
-  gap: 90px; /* Adds space between items */
-  padding: 0;
+/* Reset all elements to remove default margins and padding */
+* {
   margin: 0;
-}
-
-/* Navigation list item styling */
-nav ul li {
-  text-align: center; /* Centers text */
-}
-
-/* Navigation links styling */
-nav ul li a {
-  color: black; /* Sets link color */
-  text-decoration: none; /* Removes underline */
-  font-size: 21px; /* Adjusts font size */
-  font-weight: 600;
-  transition: 0.2s ease-in-out; /* Smooth hover effect */
-}
-
-/* Navigation link hover effect */
-nav ul li a:hover {
-  color: white; /* Changes color on hover */
-  background-color: #2c3e50; /* Darker background */
-  border-radius: 7px;
-  padding: 5px 10px;
-}
-
-/* ======================== */
-/* SignUp Button Styling */
-/* ======================== */
-
-/* Wrapper to align the button to the right */
-.signup-container {
-  padding-right: 50px; /* Adds spacing from the right edge */
-}
-
-/* SignUp Button */
-.signup {
-  background-color: #2c3e50; /* Dark blue color */
-  color: white;
-  padding: 8px 15px;
-  border-radius: 15px;
-  text-decoration: none;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-/* SignUp Button Hover Effect */
-.signup:hover {
-  background-color: #1a252f; /* Slightly darker */
-}
-
-/* Footer.css */
-.footer {
-  background-color: #1a1a1a;
-  color: #ffffff;
-  padding: 2rem 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-}
-
-.footer-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-.footer-column {
-  flex: 1;
-  min-width: 200px;
-  margin-bottom: 2rem;
-  padding: 0 1rem;
-}
-
-.footer-heading {
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  color: #ffffff;
-}
-
-.footer-subheading {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: #ffffff;
-}
-
-.footer-text {
-  color: #a0a0a0;
-  line-height: 1.5;
-  max-width: 300px;
-}
-
-.footer-links {
-  list-style: none;
   padding: 0;
-  margin: 0;
+  box-sizing: border-box;
 }
 
-.footer-links li {
-  margin-bottom: 0.5rem;
-}
-
-.footer-link {
-  color: #a0a0a0;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.footer-link:hover {
-  color: #ffffff;
-}
-
-.footer-address {
-  color: #a0a0a0;
-  font-style: normal;
+/* Body styles */
+body {
+  font-family: Arial, sans-serif;
   line-height: 1.6;
 }
 
-.footer-bottom {
-  border-top: 1px solid #2a2a2a;
-  padding-top: 1.5rem;
-  margin-top: 2rem;
-  text-align: center;
-  color: #a0a0a0;
-  font-size: 0.875rem;
+
+/* ========= MAIN CONTENT ========= */
+main {
+  padding-top: 47px;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .footer-column {
-    flex: 100%;
-    margin-bottom: 1.5rem;
-  }
+.image-header {
+  width: 100%;
+  height: 80vh; /* Dynamic height based on viewport */
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5); /* Shadow below the image */
+}
 
-  .footer-container {
-    flex-direction: column;
-  }
+.fcit-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+#cover {
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+}
+
+.image-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  text-align: center;
+  width: 80%;
+  z-index: 2;
+}
+
+.image-text h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.image-text p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+
+/* ========= Feature Highlights ========= */
+
+.features {
+  text-align: center;
+  padding: 50px 20px;
+  background-color: #ffffff;
+}
+
+.features h2 {
+  font-size: 2rem;
+  margin-bottom: 30px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.feature-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.feature-icon {
+  font-size: 40px;
+  color: #1a1a1a;
+  margin-bottom: 15px;
 }

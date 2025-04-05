@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./components/Home/Home";
+import Layout from './components/Layout/Layout'; // your layout
 import SignUp from "./components/SignUp/SignUp";
 import Login from "./components/Login/Login";
 import Profile from "./components/Profile/Profile";
@@ -12,6 +13,7 @@ import AppointmentForm from "./components/AppointmentForm/AppointmentForm";
 function App() {
   return (
     <Router>
+      <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<SignUp />} />
@@ -22,6 +24,7 @@ function App() {
         <Route path="/appointments" element={<Appointments />} />
         <Route path="/appointments/new" element={<AppointmentForm />} />
       </Routes>
+      </Layout>
     </Router>
   );
 }
