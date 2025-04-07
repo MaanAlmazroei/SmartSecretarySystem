@@ -4,6 +4,7 @@ import Home from "./components/Home/Home";
 import Layout from './components/Layout/Layout'; // your layout
 import SignUp from "./components/SignUp/SignUp";
 import Login from "./components/Login/Login";
+import Portal from "./components/SelfServicePortal/Portal";
 import Profile from "./components/Profile/Profile";
 import Tickets from "./components/Tickets/Tickets";
 import TicketForm from "./components/TicketForm/TicketForm";
@@ -18,6 +19,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/portal" element={<Portal />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/tickets" element={<Tickets />} />
         <Route path="/tickets/new" element={<TicketForm />} />

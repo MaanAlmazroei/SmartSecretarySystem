@@ -1,0 +1,28 @@
+/* Creates the root grid layout */
+.layout {
+  display: grid;
+  grid-template-areas:
+    "header"
+    "main"
+    "footer";
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+}
+
+header {
+  grid-area: header;
+}
+
+.main-content {
+  grid-area: main;
+  display: grid;
+  grid-template-columns: 1fr;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+footer {
+  grid-area: footer;
+}

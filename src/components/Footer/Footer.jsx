@@ -1,13 +1,12 @@
 import React, { useState } from "react";
-import './Footer.css';
+import "./Footer.css";
 
 const Footer = () => {
-    const currentYear = new Date().getFullYear();
-    return (
-        <div>
-            
-            {/* Footer Section */}
-            <footer className="footer">
+  const currentYear = new Date().getFullYear();
+  return (
+    <div>
+      {/* Footer Section */}
+      <footer className="footer">
         <div className="footer-container">
           <div className="footer-column">
             <h3 className="footer-heading">Smart Secretary System</h3>
@@ -61,8 +60,8 @@ const Footer = () => {
           </p>
         </div>
       </footer>
-        </div>
-    );
+    </div>
+  );
 };
 
 export default Footer;
