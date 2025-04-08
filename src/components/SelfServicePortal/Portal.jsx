@@ -1,5 +1,5 @@
 const Portal = () => {
-  return <main></main>;
+  return <></>;
 };
 
 export default Portal;

@@ -1,14 +1,9 @@
 /* ========= HEADER STYLES ========= */
 header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  width: 100%;
   background-color: white;
   box-shadow: 0 6px 6px rgba(0, 0, 0, 0.5);
 }
@@ -166,8 +161,8 @@ nav ul li a:hover {
   .nav-center,
   .signup-container {
     display: none;
-    position: relative; /* Ensure it's inside the flow */
-    bottom: 20px; /* Move it up */
+    position: relative;
+    bottom: 20px;
   }
   .menu-btn {
     display: flex;

@@ -1,4 +1,3 @@
-/* Creates the root grid layout */
 .layout {
   display: grid;
   grid-template-areas:
@@ -7,20 +6,20 @@
     "footer";
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;
+  margin: 0;
 }
 
 header {
   grid-area: header;
+  position: sticky;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1000;
 }
 
-.main-content {
+main {
   grid-area: main;
-  display: grid;
-  grid-template-columns: 1fr;
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
 }
 
 footer {

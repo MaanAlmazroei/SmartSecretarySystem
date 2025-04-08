@@ -1,35 +1,27 @@
-/* Reset all elements to remove default margins and padding */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 /* Body styles */
 body {
-  font-family: Arial, sans-serif;
   line-height: 1.6;
 }
 
 .image-header {
   width: 100%;
-  height: 80vh; /* Dynamic height based on viewport */
+  height: 60vh;
   overflow: hidden;
   position: relative;
-  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5); /* Shadow below the image */
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
 }
 
 .fcit-image {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: 60vh;
+  object-fit: fill;
   object-position: center;
 }
 
 #cover {
   background-color: rgba(0, 0, 0, 0.5);
   width: 100%;
-  height: 100%;
+  height: 60vh;
   position: absolute;
   top: 0;
 }
@@ -42,7 +34,6 @@ body {
   color: white;
   text-align: center;
   width: 80%;
-  z-index: 2;
 }
 
 .image-text h1 {

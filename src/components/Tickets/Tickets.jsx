@@ -1,7 +1,5 @@
-
-
 const Tickets = () => {
-  return <main></main>;
+  return <></>;
 };
 
 export default Tickets;

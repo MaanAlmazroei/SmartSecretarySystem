@@ -1,9 +1,5 @@
-
-
 const Appointments = () => {
-    return (
-        <main></main>
-    );
-}
+  return <></>;
+};
 
 export default Appointments;

@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import "./Footer.css";
+import {Link} from "react-router-dom"
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   return (
-    <div>
-      {/* Footer Section */}
-      <footer className="footer">
+      <footer>
         <div className="footer-container">
           <div className="footer-column">
             <h3 className="footer-heading">Smart Secretary System</h3>
@@ -20,24 +19,24 @@ const Footer = () => {
             <h4 className="footer-subheading">Quick Links</h4>
             <ul className="footer-links">
               <li>
-                <a href="#" className="footer-link">
+                <Link to="/tickets" className="footer-link">
                   Tickets
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="footer-link">
+                <Link to="/appointments" className="footer-link">
                   Appointments
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="footer-link">
+                <Link to="/knowledge-base" className="footer-link">
                   Knowledge Base
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="footer-link">
+                <Link to="/profile" className="footer-link">
                   Profile
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -60,7 +59,6 @@ const Footer = () => {
           </p>
         </div>
       </footer>
-    </div>
   );
 };
 
