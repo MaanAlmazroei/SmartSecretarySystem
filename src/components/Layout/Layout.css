@@ -9,19 +9,16 @@
   margin: 0;
 }
 
-header {
+.header {
   grid-area: header;
   position: sticky;
-  top: 0;
-  right: 0;
-  left: 0;
   z-index: 1000;
 }
 
-main {
+.main {
   grid-area: main;
 }
 
-footer {
+.footer {
   grid-area: footer;
 }

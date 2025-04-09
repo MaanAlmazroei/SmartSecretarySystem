@@ -1,7 +1,7 @@
+import "./SignUp.css";
+
 const SignUp = () => {
-    return (
-        <></>
-    );
+  return <></>;
 };
 
 export default SignUp;

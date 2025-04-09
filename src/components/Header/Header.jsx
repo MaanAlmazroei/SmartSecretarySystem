@@ -7,7 +7,7 @@ const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header>
+    <header className="header">
       <div className="logo">
         <NavLink to="/">
           <img src={logo} alt="SSS Logo" />

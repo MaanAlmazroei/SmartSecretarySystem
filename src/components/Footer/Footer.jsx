@@ -5,7 +5,7 @@ import {Link} from "react-router-dom"
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   return (
-      <footer>
+      <footer className="footer">
         <div className="footer-container">
           <div className="footer-column">
             <h3 className="footer-heading">Smart Secretary System</h3>

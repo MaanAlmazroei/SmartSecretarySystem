@@ -1,3 +1,5 @@
+import "./Portal.css"
+
 const Portal = () => {
   return <></>;
 };
