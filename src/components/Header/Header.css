@@ -8,9 +8,15 @@
   box-shadow: 0 6px 6px rgba(0, 0, 0, 0.5);
 }
 
+.logo {
+  display: flex;
+  width: 65px;
+  height: 65px;
+}
+
 .logo img {
-  width: 80px;
-  padding-left: 15px;
+  width: 65px;
+  height: 65px;
 }
 
 /* ========= NAVIGATION ========= */
@@ -30,8 +36,6 @@ nav ul {
   list-style: none;
   display: flex;
   gap: 90px;
-  padding: 0;
-  margin: 0;
 }
 
 nav ul li {
@@ -55,6 +59,29 @@ nav ul li a:hover {
   padding: 5px 10px;
 }
 
+/* ========= DARK MODE BUTTON ========= */
+
+.header-dark-container {
+  display: flex;
+  margin-right: 20px;
+}
+
+.header-dark-btn {
+  border: none;
+  background-color: white;
+  width: 25px;
+  height: 25px;
+}
+
+.header-dark-icon {
+  width: 25px;
+  height: 25px;
+}
+
+.header-dark-icon:hover {
+  background-color: red;
+}
+
 /* ========= SIGNUP BUTTON ========= */
 .signup-container {
   padding-right: 50px;
@@ -73,7 +100,7 @@ nav ul li a:hover {
 
 .signup:hover {
   background-color: black;
-  box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.2); /* Shadow below the image */
+  box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.2);
 }
 
 /* ========= MOBILE MENU BUTTON ========= */

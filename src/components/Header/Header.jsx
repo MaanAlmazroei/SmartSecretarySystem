@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom"; // Changed from Link to NavLink
+import { NavLink } from "react-router-dom";
+import { FaMoon } from "react-icons/fa";
 import logo from "../../assets/SSS_Logo.png";
 import "./Header.css";
 
@@ -69,7 +70,11 @@ const Header = () => {
             </li>
           </ul>
         </div>
-
+        <div className="header-dark-container">
+          <button className="header-dark-btn">
+            <FaMoon className="header-dark-icon" />
+          </button>
+        </div>
         <div className="signup-container">
           <NavLink to="/signup" className="signup">
             Sign Up

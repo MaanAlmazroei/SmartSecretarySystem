@@ -13,6 +13,7 @@
   grid-area: header;
   position: sticky;
   z-index: 1000;
+  top: 0;
 }
 
 .main {
