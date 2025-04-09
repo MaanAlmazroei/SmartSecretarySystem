@@ -1,0 +1,200 @@
+/* Base styles */
+.Login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+    padding: 2rem;
+    box-sizing: border-box;
+  }
+  
+  /* white card wrapper */
+  .Login-wrapper {
+    display: flex;
+    width: 90%;
+    max-width: 1200px;
+    min-height: 70vh;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  /* Form container (left side) */
+  .Login-formContainer {
+    flex: 1;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  /* Form title */
+  .Login-title {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  
+  /* form subtitle */
+  .Login-subtitle {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 2rem;
+  }
+  
+  /* Form element */
+  .Login-form {
+    width: 100%;
+  }
+  
+  /* Input group container */
+  .Login-inputGroup {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Input field styling */
+  .Login-input {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+  
+  .Login-input:focus {
+    border-color: #4a90e2;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  }
+  
+  /* Floating label styling */
+  .Login-label {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    color: #999;
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+  
+  /* Animated label when input is focused/has value */
+  .Login-input:focus + .Login-label,
+  .Login-input:not(:placeholder-shown) + .Login-label {
+    top: -0.5rem;
+    left: 0.8rem;
+    font-size: 0.8rem;
+    background: white;
+    padding: 0 0.2rem;
+    color: black;
+  }
+  
+  /* Error styling */
+  .Login-input.error {
+    border-color: #F44336;
+  }
+  
+  .Login-error {
+    color: #F44336;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+    display: block;
+  }
+  
+  /* Login options */
+  .Login-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1rem 0;
+  }
+  
+  .Login-remember {
+    display: flex;
+    align-items: center;
+  }
+  
+  .Login-remember input {
+    margin-right: 0.5rem;
+  }
+  
+  .Login-forgot {
+    color: #4a90e2;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  
+  .Login-forgot:hover {
+    text-decoration: underline;
+  }
+  
+  /* Submit button */
+  .Login-submitButton {
+    width: 100%;
+    padding: 1rem;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 1rem;
+  }
+  
+  .Login-submitButton:hover {
+    background-color: #252525;
+  }
+  
+  /* Logo container (right side) */
+  .Login-logoContainer {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    padding: 2rem;
+  }
+  
+  /* Logo image */
+  .Login-logo {
+    max-width: 80%;
+    height: auto;
+    object-fit: contain;
+    background: transparent;
+  }
+  
+  /* Footer with signup link */
+  .Login-footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: #666;
+  }
+  
+  .Login-footerLink {
+    color: #4a90e2;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .Login-footerLink:hover {
+    text-decoration: underline;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    /* Stack form and logo vertically on mobile */
+    .Login-wrapper {
+      flex-direction: column;
+      min-height: auto;
+    }
+    
+    /* Move logo to top on mobile */
+    .Login-logoContainer {
+      padding: 1.5rem;
+      order: -1;
+    }
+  }
