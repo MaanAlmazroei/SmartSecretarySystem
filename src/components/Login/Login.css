@@ -116,6 +116,9 @@
     display: flex;
     align-items: center;
   }
+  .Login-remember label {
+    white-space: nowrap; /* Prevents line break */
+  }
   
   .Login-remember input {
     margin-right: 0.5rem;

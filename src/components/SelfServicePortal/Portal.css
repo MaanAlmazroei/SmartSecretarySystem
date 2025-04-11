@@ -1,9 +1,10 @@
 .Portal-container {
     max-width: 900px;
-    margin: 0 auto;
+    margin: 60px auto 40px; /* Increased top margin to push it down */
     padding: 2rem;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     background-color: #fff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); /* 👈 Enhanced shadow */
   }
   
   .Portal-heading {
