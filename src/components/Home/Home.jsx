@@ -1,7 +1,8 @@
 import "./Home.css";
 import FCIT from "../../assets/kau_fcit_building.jpg";
 import { FaRobot, FaCalendarCheck, FaTicketAlt, FaBook } from "react-icons/fa";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
+
 const Home = () => {
   return (
     <>
@@ -32,9 +33,9 @@ const Home = () => {
 
           <div className="feature-card">
             <Link to="/appointments" className="card-link">
-            <FaCalendarCheck className="feature-icon" />
-            <h3>Appointments</h3>
-            <p>Schedule a meeting with the secretary in a few clicks.</p>
+              <FaCalendarCheck className="feature-icon" />
+              <h3>Appointments</h3>
+              <p>Schedule a meeting with the secretary in a few clicks.</p>
             </Link>
           </div>
 
