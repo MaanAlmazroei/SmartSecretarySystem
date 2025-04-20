@@ -32,11 +32,9 @@ const Home = () => {
           </div>
 
           <div className="feature-card">
-            <Link to="/appointments" className="card-link">
-              <FaCalendarCheck className="feature-icon" />
-              <h3>Appointments</h3>
-              <p>Schedule a meeting with the secretary in a few clicks.</p>
-            </Link>
+            <FaCalendarCheck className="feature-icon" />
+            <h3>Appointments</h3>
+            <p>Schedule a meeting with the secretary in a few clicks.</p>
           </div>
 
           <div className="feature-card">

@@ -97,25 +97,4 @@ export const deleteDocument = async (collectionName, id) => {
   await deleteDoc(docRef);
 };
 
-export const getDocumentById = async (collectionName, id) => {
-  const docRef = doc(db, collectionName, id);
-  const docSnap = await getDoc(docRef);
-  return docSnap.exists()
-    ? {
-        id: docSnap.id,
-        ...docSnap.data(),
-        ...(docSnap.data().registrationDate && {
-          registrationDate: docSnap.data().registrationDate.toDate(),
-        }),
-        ...(docSnap.data().issueDate && {
-          issueDate: docSnap.data().issueDate.toDate(),
-        }),
-        ...(docSnap.data().appointmentDate && {
-          appointmentDate: docSnap.data().appointmentDate.toDate(),
-        }),
-        ...(docSnap.data().lastUpdatedDate && {
-          lastUpdatedDate: docSnap.data().lastUpdatedDate.toDate(),
-        }),
-      }
-    : null;
-};
+export const getDocumentById = async (collectionName, id) => {};

@@ -1,21 +1,12 @@
-/* AppointmentPage.css */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Inter', sans-serif;
-}
-
 .appointment-container {
-  max-width: 1000px; /* Increased width */
+  max-width: 1000px;
   margin: 2rem auto;
-  padding: 3rem; /* Increased padding */
+  padding: 3rem;
   background-color: #f8f8f8;
   border-radius: 10px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
+  animation: fadeIn 0.5s ease-out;
 }
 
 .appointment-container:hover {
@@ -35,19 +26,37 @@
 .appointment-content {
   display: flex;
   gap: 20px;
-  justify-content: space-between; /* Ensure proper spacing between form and booked appointments */
+  justify-content: space-between;
 }
 
 .appointment-form {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
-  flex: 3; /* Take more space for the form */
+  flex: 3;
 }
 
 .form-group {
   margin-bottom: 1rem;
   grid-column: span 1;
+  animation: fadeIn 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.form-group:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.form-group:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.form-group:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.form-group:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.form-group:nth-child(5) {
+  animation-delay: 0.5s;
 }
 
 .form-group:nth-child(4),
@@ -57,14 +66,15 @@
   grid-column: span 2;
 }
 
-label {
+.appointment-form label {
   display: block;
   font-weight: 500;
   margin-bottom: 0.5rem;
   color: #444;
 }
 
-input, textarea {
+.appointment-form input,
+.appointment-form textarea {
   width: 100%;
   padding: 0.8rem;
   border: 1px solid #ddd;
@@ -74,13 +84,15 @@ input, textarea {
   background-color: white;
 }
 
-input:focus, textarea:focus {
+.appointment-form input:focus,
+.appointment-form textarea:focus {
   border-color: #333;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
   outline: none;
 }
 
-input.error, textarea.error {
+.appointment-form input.error,
+.appointment-form textarea.error {
   border-color: #ff3b30;
 }
 
@@ -92,13 +104,25 @@ input.error, textarea.error {
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-5px); }
-  40%, 80% { transform: translateX(5px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-5px);
+  }
+  40%,
+  80% {
+    transform: translateX(5px);
+  }
 }
 
 .time-slot-section {
   margin-top: 1rem;
+  animation: fadeIn 0.5s ease-out forwards;
+  animation-delay: 0.6s;
+  opacity: 0;
 }
 
 .time-slot-section h3 {
@@ -170,6 +194,9 @@ input.error, textarea.error {
   margin-top: 1.5rem;
   text-transform: uppercase;
   letter-spacing: 1px;
+  animation: fadeIn 0.5s ease-out forwards;
+  animation-delay: 0.7s;
+  opacity: 0;
 }
 
 .submit-button.valid {
@@ -190,11 +217,11 @@ input.error, textarea.error {
 }
 
 .booked-appointments {
-  flex: 1; /* Take less space for the booked appointments */
-  max-width: 300px; /* Fixed width for the side card */
-  height: auto; /* Adjust height dynamically */
-  overflow-y: auto; /* Enable scrolling for multiple bookings */
-  margin: 0; /* Remove extra margin */
+  flex: 1;
+  max-width: 300px;
+  height: auto;
+  overflow-y: auto;
+  margin: 0;
   padding: 1rem;
   border: 1px solid #ddd;
   border-radius: 10px;
@@ -233,7 +260,6 @@ input.error, textarea.error {
   text-align: center;
 }
 
-/* Remove the reason from the card display */
 .appointment-card p:nth-child(3) {
   display: none;
 }
@@ -244,7 +270,7 @@ input.error, textarea.error {
 }
 
 .appointment-card p strong {
-  color: #333; /* Highlight labels */
+  color: #333;
 }
 
 @media (max-width: 768px) {
@@ -252,11 +278,11 @@ input.error, textarea.error {
     padding: 1.5rem;
     margin: 1rem;
   }
-  
+
   .appointment-form {
     grid-template-columns: 1fr;
   }
-  
+
   .form-group,
   .form-group:nth-child(4),
   .form-group:nth-child(5),
@@ -264,41 +290,19 @@ input.error, textarea.error {
   .submit-button {
     grid-column: span 1;
   }
-  
+
   .time-slots-container {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   }
 }
 
-/* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.appointment-container {
-  animation: fadeIn 0.5s ease-out;
-}
-
-.form-group {
-  animation: fadeIn 0.5s ease-out forwards;
-  opacity: 0;
-}
-
-.form-group:nth-child(1) { animation-delay: 0.1s; }
-.form-group:nth-child(2) { animation-delay: 0.2s; }
-.form-group:nth-child(3) { animation-delay: 0.3s; }
-.form-group:nth-child(4) { animation-delay: 0.4s; }
-.form-group:nth-child(5) { animation-delay: 0.5s; }
-
-.time-slot-section {
-  animation: fadeIn 0.5s ease-out forwards;
-  animation-delay: 0.6s;
-  opacity: 0;
-}
-
-.submit-button {
-  animation: fadeIn 0.5s ease-out forwards;
-  animation-delay: 0.7s;
-  opacity: 0;
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

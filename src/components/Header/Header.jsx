@@ -14,7 +14,6 @@ const Header = () => {
         </NavLink>
       </div>
 
-      {/* Mobile menu button */}
       <div
         className={`menu-btn ${menuOpen ? "open" : ""}`}
         onClick={() => setMenuOpen(!menuOpen)}
@@ -32,7 +31,7 @@ const Header = () => {
                 to="/"
                 className={({ isActive }) => (isActive ? "nav-active" : "")}
               >
-                Dashboard
+                Home
               </NavLink>
             </li>
             <li>
@@ -69,12 +68,12 @@ const Header = () => {
             </li>
           </ul>
         </div>
-        <div className="signup-container">
-          <NavLink to="/signup" className="signup">
-            Sign Up
-          </NavLink>
-        </div>
       </nav>
+      <div className="signup-container">
+        <NavLink to="/signup" className="signup">
+          Sign Up
+        </NavLink>
+      </div>
     </header>
   );
 };

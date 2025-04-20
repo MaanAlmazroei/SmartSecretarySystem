@@ -1,237 +1,207 @@
-/* Main page container - centers everything */
-.SignUp-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f5f5f5;
-    padding: 2rem;
-    box-sizing: border-box;
-  }
-  
-  /* White card wrapper */
-  .SignUp-wrapper {
-    display: flex;
-    width: 90%;
-    max-width: 1200px;
-    min-height: 80vh;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-  }
-  
-  /* Form container (left side) */
-  .SignUp-formContainer {
-    flex: 1;
-    padding: 3rem;
-    display: flex;
+.signUp-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.signUp-wrapper {
+  display: flex;
+  width: 90%;
+  max-width: 1200px;
+  min-height: 80vh;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.signUp-formContainer {
+  flex: 1;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.signUp-title {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.signUp-subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.signUp-form {
+  width: 100%;
+}
+
+.signUp-nameFields {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.signUp-halfWidth {
+  flex: 1;
+}
+
+.signUp-inputGroup {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.signUp-input {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+
+.signUp-input:focus {
+  border-color: #4a90e2;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.signUp-label {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  color: #999;
+  transition: all 0.3s;
+  pointer-events: none;
+}
+
+.signUp-input:focus + .signUp-label,
+.signUp-input:not(:placeholder-shown) + .signUp-label {
+  top: -0.5rem;
+  left: 0.8rem;
+  font-size: 0.8rem;
+  background: white;
+  padding: 0 0.2rem;
+  color: black;
+}
+
+.signUp-submitButton {
+  width: 100%;
+  padding: 1rem;
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 1rem;
+}
+
+.signUp-submitButton:hover {
+  background-color: #252525;
+}
+
+.signUp-logoContainer {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  padding: 2rem;
+}
+
+.signUp-logo {
+  max-width: 80%;
+  height: auto;
+  object-fit: contain;
+}
+
+.signUp-footer {
+  text-align: center;
+  margin-top: 2rem;
+  color: #666;
+}
+
+.signUp-footerLink {
+  color: #4a90e2;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.signUp-footerLink:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .signUp-wrapper {
     flex-direction: column;
-    justify-content: center;
-  }
-  
-  /* Form title */
-  .SignUp-title {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-    color: #333;
-  }
-  
-  /* Form subtitle */
-  .SignUp-subtitle {
-    font-size: 1.1rem;
-    color: #666;
-    margin-bottom: 2rem;
-  }
-  
-  /* Form element */
-  .SignUp-form {
-    width: 100%;
-  }
-  
-  /* Name fields container (first + last name) */
-  .SignUp-nameFields {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-  }
-  
-  /* Half-width fields for first/last name */
-  .SignUp-halfWidth {
-    flex: 1;
-  }
-  
-  /* Input group container */
-  .SignUp-inputGroup {
-    position: relative;
-    margin-bottom: 1.5rem;
-  }
-  
-  /* Input field styling */
-  .SignUp-input {
-    width: 100%;
-    padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.3s;
-  }
-  
-  /* Input focus state */
-  .SignUp-input:focus {
-    border-color: #4a90e2;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
-  }
-  
-  /* Floating label styling */
-  .SignUp-label {
-    position: absolute;
-    left: 1rem;
-    top: 1rem;
-    color: #999;
-    transition: all 0.3s;
-    pointer-events: none;
-  }
-  
-  /* Animated label when input is focused/has value */
-  .SignUp-input:focus + .SignUp-label,
-  .SignUp-input:not(:placeholder-shown) + .SignUp-label {
-    top: -0.5rem;
-    left: 0.8rem;
-    font-size: 0.8rem;
-    background: white;
-    padding: 0 0.2rem;
-    color: black;
-  }
-  
-  /* Submit button */
-  .SignUp-submitButton {
-    width: 100%;
-    padding: 1rem;
-    background-color: black;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    margin-top: 1rem;
-  }
-  
-  /* Submit button hover state */
-  .SignUp-submitButton:hover {
-    background-color: #252525;
-  }
-  
-  /* Logo container (right side) */
-  .SignUp-logoContainer {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: white;
-    padding: 2rem;
-  }
-  
-  /* Logo image */
-  .SignUp-logo {
-    max-width: 80%;
-    height: auto;
-    object-fit: contain;
-  }
-  
-  /* Footer with login link */
-  .SignUp-footer {
-    text-align: center;
-    margin-top: 2rem;
-    color: #666;
-  }
-  
-  /* Login link */
-  .SignUp-footerLink {
-    color: #4a90e2;
-    text-decoration: none;
-    font-weight: 500;
-  }
-  
-  /* Login link hover state */
-  .SignUp-footerLink:hover {
-    text-decoration: underline;
-  }
-  
-  /* Mobile responsiveness */
-  @media (max-width: 768px) {
-    /* Stack form and logo vertically on mobile */
-    .SignUp-wrapper {
-      flex-direction: column;
-      min-height: auto;
-    }
-    
-    /* Move logo to top on mobile */
-    .SignUp-logoContainer {
-      padding: 1.5rem;
-      order: -1;
-    }
-    
-    /* Stack name fields vertically on mobile */
-    .SignUp-nameFields {
-      flex-direction: column;
-      gap: 0;
-    }
-    
-    /* Full width for name fields on mobile */
-    .SignUp-halfWidth {
-      width: 100%;
-    }
+    min-height: auto;
   }
 
+  .signUp-logoContainer {
+    padding: 1.5rem;
+    order: -1;
+  }
 
+  .signUp-nameFields {
+    flex-direction: column;
+    gap: 0;
+  }
 
-/* Error styling */
-.SignUp-input.error {
-    border-color: #F44336;
+  .signUp-halfWidth {
+    width: 100%;
   }
-  
-  .SignUp-error {
-    color: #F44336;
-    font-size: 0.8rem;
-    margin-top: 0.3rem;
-    display: block;
-  }
-  
-  /* Password requirements styling */
-  .SignUp-passwordRequirements {
-    margin-top: 0.5rem;
-    font-size: 0.8rem;
-    color: #666;
-  }
-  
-  .SignUp-passwordRequirements ul {
-    padding-left: 1.2rem;
-    margin: 0.5rem 0 0 0;
-  }
-  
-  .SignUp-passwordRequirements li {
-    margin-bottom: 0.2rem;
-    color: #F44336;
-  }
-  
-  .SignUp-passwordMatch {
-    margin-top: 0.5rem;
-    font-size: 0.8rem;
-  }
-  
-  .SignUp-passwordMatch.valid {
-    color: #4CAF50;
-  }
-  
-  .SignUp-passwordMatch.invalid {
-    color: #F44336;
-  }
-  
-  /* Disabled button styling */
-  .SignUp-submitButton:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-  }
+}
+
+.signUp-input.error {
+  border-color: #f44336;
+}
+
+.signUp-error {
+  color: #f44336;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+  display: block;
+}
+
+.signUp-passwordRequirements {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.signUp-passwordRequirements ul {
+  padding-left: 1.2rem;
+  margin: 0.5rem 0 0 0;
+}
+
+.signUp-passwordRequirements li {
+  margin-bottom: 0.2rem;
+  color: #f44336;
+}
+
+.signUp-passwordMatch {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.signUp-passwordMatch.valid {
+  color: #4caf50;
+}
+
+.signUp-passwordMatch.invalid {
+  color: #f44336;
+}
+
+.signUp-submitButton:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}

@@ -78,8 +78,6 @@
   font-size: 0.875rem;
 }
 
-/* Footer responsive style*/
-
 @media (max-width: 768px) {
   .footer-column {
     flex: 100%;

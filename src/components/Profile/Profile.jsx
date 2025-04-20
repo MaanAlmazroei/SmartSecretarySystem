@@ -18,7 +18,6 @@ const Profile = () => {
     language: "English",
   });
 
-  // Sync activeTab with current route
   useEffect(() => {
     if (location.pathname.includes("settings")) {
       setActiveTab("settings");
@@ -44,7 +43,6 @@ const Profile = () => {
     setEditMode(false);
     console.log("Profile updated:", userData);
     console.log("Settings updated:", settings);
-    // Here you would typically send data to your backend
   };
 
   return (
