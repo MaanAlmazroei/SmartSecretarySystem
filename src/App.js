@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import Home from "./components/Home/Home.jsx";
 import Layout from "./components/Layout/Layout.jsx";
 import SignUp from "./components/SignUp/SignUp.jsx";
@@ -12,6 +13,7 @@ import Appointments from "./components/Appointments/Appointments.jsx";
 function App() {
   return (
     <Router>
+      <Toaster position="top-center" reverseOrder={false} />
       <Layout>
         <Routes>
           {/* Public Routes */}

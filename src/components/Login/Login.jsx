@@ -2,9 +2,12 @@ import React, { useState } from "react";
 import logo from "../../assets/SSS_Logo.png";
 import "./Login.css";
 import { logIn } from "../../services/FirebaseAuth";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 function Login() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -44,9 +47,13 @@ function Login() {
     if (validateForm()) {
       try {
         const user = await logIn(formData.email, formData.password);
+        toast.success("Logged in successfully!");
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
         return user;
       } catch (error) {
-        console.error("Signin failed:", error.message);
+        toast.error("Login failed!");
       }
     }
   };

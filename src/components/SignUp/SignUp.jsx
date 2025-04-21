@@ -3,9 +3,12 @@ import logo from "../../assets/SSS_Logo.png";
 import "./SignUp.css";
 import { signUp } from "../../services/FirebaseAuth";
 import { createUser } from "../../services/FirebaseDB";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 const SignUp = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -93,9 +96,13 @@ const SignUp = () => {
           phone: formData.phone,
         };
         const user = await createUser(userCredential.uid, userData);
+        toast.success("Signed up successfully!");
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
         return user;
       } catch (error) {
-        console.error("Signup failed:", error.message);
+        toast.error("Signup failed!");
       }
     }
   };
