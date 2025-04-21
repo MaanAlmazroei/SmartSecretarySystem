@@ -1,100 +1,135 @@
 import { db } from "./FirebaseConfig";
 import {
   collection,
-  addDoc,
-  setDoc,
-  getDoc,
   doc,
+  setDoc,
+  addDoc,
+  getDoc,
+  getDocs,
   updateDoc,
   deleteDoc,
   serverTimestamp,
+  query,
+  where,
 } from "firebase/firestore";
 
-// ==================== USER CRUD ====================
-export const addUser = async (userData) => {
-  const userRef = doc(db, "users", userData.id);
-  try {
-    const user = await setDoc(userRef, {
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      phone: userData.phone,
-      role: "user",
-      notificationCounter: 0,
-      lastUpdatedDate: serverTimestamp(),
-    });
-    return user;
-  } catch (error) {
-    console.error(error.message);
-  }
+const usersCollection = collection(db, "users");
+
+export const createUser = async (userId, userData) => {
+  await setDoc(doc(usersCollection, userId), {
+    ...userData,
+    role: "user",
+    notificationCounter: 0,
+    lastUpdatedDate: serverTimestamp(),
+  });
 };
 
-export const getUser = async (id) => {
-  try {
-    const docRef = doc(db, "users", id);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() };
-    } else {
-      console.log("No such user!");
-      return null;
-    }
-  } catch (error) {
-    console.error("Error getting user:", error.message);
-    throw error;
-  }
+export const getUser = async (userId) => {
+  const userDoc = await getDoc(doc(usersCollection, userId));
+  return userDoc.exists() ? userDoc.data() : null;
 };
-export const updateUser = async (id, updatedData) => {
-  const docRef = doc(db, "users", id);
-  await updateDoc(docRef, {
+
+export const getAllUsers = async () => {
+  const snapshot = await getDocs(usersCollection);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
+export const updateUser = async (userId, updatedData) => {
+  await updateDoc(doc(usersCollection, userId), {
     ...updatedData,
-  });
-};
-
-export const deleteUser = async () => {};
-
-// ==================== TICKET CRUD ====================
-export const createTicket = async (ticketData) => {
-  const docRef = await addDoc(collection(db, "tickets"), {
-    title: ticketData.title,
-    issueDescription: ticketData.issueDescription,
-    issueDate: serverTimestamp(),
-    status: "open",
-    feedback: "",
-    rating: 0,
     lastUpdatedDate: serverTimestamp(),
   });
-  return docRef;
 };
 
-// ==================== APPOINTMENT CRUD ====================
-export const createAppointment = async (appointmentData) => {
-  const docRef = await addDoc(collection(db, "appointments"), {
-    appointmentDate: appointmentData.appointmentDate,
-    reason: appointmentData.reason,
-    status: "scheduled",
-    feedback: "",
-    rating: 0,
-    lastUpdatedDate: serverTimestamp(),
-  });
-  return docRef.id;
+export const deleteUser = async (userId) => {
+  await deleteDoc(doc(usersCollection, userId));
 };
 
-// ==================== RESOURCE CRUD ====================
+/* ===== TICKETS CRUD ===== */
+const ticketsCollection = collection(db, "tickets");
+
+export const createTicket = async (ticketData, userId) => {
+  await addDoc(ticketsCollection, { ...ticketData, userId });
+};
+
+export const getTicket = async (ticketId) => {
+  const ticketDoc = await getDoc(doc(ticketsCollection, ticketId));
+  return ticketDoc.exists() ? ticketDoc.data() : null;
+};
+
+export const getAllTickets = async () => {
+  const snapshot = await getDocs(ticketsCollection);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
+export const getUserAllTickets = async (userId) => {
+  const q = query(ticketsCollection, where("userId", "==", userId));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
+export const updateTicket = async (ticketId, updatedData) => {
+  await updateDoc(doc(ticketsCollection, ticketId), updatedData);
+};
+
+export const deleteTicket = async (ticketId) => {
+  await deleteDoc(doc(ticketsCollection, ticketId));
+};
+
+/* ===== APPOINTMENTS CRUD ===== */
+const appointmentsCollection = collection(db, "appointments");
+
+export const createAppointment = async (appointmentData, userId) => {
+  await addDoc(appointmentsCollection, { ...appointmentData, userId });
+};
+
+export const getAppointment = async (appointmentId) => {
+  const appointmentDoc = await getDoc(
+    doc(appointmentsCollection, appointmentId)
+  );
+  return appointmentDoc.exists() ? appointmentDoc.data() : null;
+};
+
+export const getAllAppointments = async () => {
+  const snapshot = await getDocs(appointmentsCollection);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
+export const getUserAllAppointments = async (userId) => {
+  const q = query(appointmentsCollection, where("userId", "==", userId));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
+export const updateAppointment = async (appointmentId, updatedData) => {
+  await updateDoc(doc(appointmentsCollection, appointmentId), updatedData);
+};
+
+export const deleteAppointment = async (appointmentId) => {
+  await deleteDoc(doc(appointmentsCollection, appointmentId));
+};
+
+/* ===== RESOURCES CRUD ===== */
+const resourcesCollection = collection(db, "resources");
+
 export const createResource = async (resourceData) => {
-  const docRef = await addDoc(collection(db, "resources"), {
-    title: resourceData.title,
-    description: resourceData.description,
-    type: resourceData.type,
-    lastUpdatedDate: serverTimestamp(),
-  });
-  return docRef.id;
+  await addDoc(resourcesCollection, resourceData);
 };
 
-// ==================== COMMON OPERATIONS ====================
-export const deleteDocument = async (collectionName, id) => {
-  const docRef = doc(db, collectionName, id);
-  await deleteDoc(docRef);
+export const getResource = async (resourceId) => {
+  const resourceDoc = await getDoc(doc(resourcesCollection, resourceId));
+  return resourceDoc.exists() ? resourceDoc.data() : null;
 };
 
-export const getDocumentById = async (collectionName, id) => {};
+export const getAllResources = async () => {
+  const snapshot = await getDocs(resourcesCollection);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
+export const updateResource = async (resourceId, updatedData) => {
+  await updateDoc(doc(resourcesCollection, resourceId), updatedData);
+};
+
+export const deleteResource = async (resourceId) => {
+  await deleteDoc(doc(resourcesCollection, resourceId));
+};

@@ -1,243 +1,278 @@
 import React, { useState, useEffect } from "react";
 import "./Appointments.css";
+import { currentUser } from "../../services/FirebaseAuth";
+import {
+  getUserAllAppointments,
+  createAppointment,
+} from "../../services/FirebaseDB";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../services/FirebaseConfig";
 
 const Appointments = () => {
-  const [formData, setFormData] = useState({
-    reasonForMeeting: "",
-    selectedDate: "",
-    selectedTimeSlot: null,
-  });
-
-  const [errors, setErrors] = useState({});
-  const [availableSlots, setAvailableSlots] = useState({});
-  const [isFormValid, setIsFormValid] = useState(false);
-  const [bookedAppointments, setBookedAppointments] = useState([]);
-
-  const [bookedSlots, setBookedSlots] = useState({
-    "2025-04-07": ["08:00", "09:30", "13:45"],
-    "2025-04-08": ["10:15", "11:00", "13:30"],
-    "2025-04-09": ["08:30", "12:45"],
-  });
-
-  const generateTimeSlots = () => {
-    const slots = [];
-    for (let hour = 8; hour <= 14; hour++) {
-      for (let minute = 0; minute < 60; minute += 15) {
-        if (hour === 14 && minute > 0) break;
-        const formattedHour = hour.toString().padStart(2, "0");
-        const formattedMinute = minute.toString().padStart(2, "0");
-        slots.push(`${formattedHour}:${formattedMinute}`);
-      }
-    }
-    return slots;
+  const initialAppointmentState = {
+    appointmentDate: "",
+    status: "Scheduled",
+    reason: "",
+    lastUpdated: "",
   };
 
-  const allTimeSlots = generateTimeSlots();
+  const [appointment, setAppointment] = useState({
+    ...initialAppointmentState,
+  });
+  const [errors, setErrors] = useState({});
+  const [appointmentsList, setAppointmentsList] = useState([]);
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(currentUser());
 
-  useEffect(() => {
-    if (formData.selectedDate) {
-      const booked = bookedSlots[formData.selectedDate] || [];
-      const available = {};
-      allTimeSlots.forEach((slot) => {
-        available[slot] = !booked.includes(slot);
-      });
-      setAvailableSlots(available);
+  const fetchAppointments = async () => {
+    if (currentUserId) {
+      try {
+        const appointments = await getUserAllAppointments(currentUserId);
+        setAppointmentsList(appointments);
+      } catch (error) {
+        console.error("Error fetching appointments:", error.message);
+      }
     }
-  }, [formData.selectedDate, bookedSlots]);
+  };
 
   useEffect(() => {
-    validateForm();
-  }, [formData]);
+    fetchAppointments();
+  }, [currentUserId]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUserId(user.uid);
+      } else {
+        setCurrentUserId(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const validateForm = () => {
     const newErrors = {};
-    if (formData.reasonForMeeting && formData.reasonForMeeting.length < 10) {
-      newErrors.reasonForMeeting =
-        "Please provide a more detailed reason (at least 10 characters)";
-    }
-    if (!formData.selectedDate) {
-      newErrors.selectedDate = "Please select a date";
-    }
-    if (!formData.selectedTimeSlot) {
-      newErrors.selectedTimeSlot = "Please select a time slot";
-    }
-    setErrors(newErrors);
 
-    const requiredFields = [
-      "reasonForMeeting",
-      "selectedDate",
-      "selectedTimeSlot",
-    ];
-    const hasAllFields = requiredFields.every((field) => !!formData[field]);
-    const hasNoErrors = Object.keys(newErrors).length === 0;
-    setIsFormValid(hasAllFields && hasNoErrors);
+    if (!appointment.appointmentDate.trim()) {
+      newErrors.appointmentDate = "Appointment date is required";
+    }
+
+    if (!appointment.reason.trim()) {
+      newErrors.reason = "Reason is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setAppointment((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
 
-  const handleDateChange = (e) => {
-    setFormData({
-      ...formData,
-      selectedDate: e.target.value,
-      selectedTimeSlot: null,
-    });
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const handleTimeSlotSelect = (timeSlot) => {
-    if (availableSlots[timeSlot]) {
-      setFormData({
-        ...formData,
-        selectedTimeSlot: timeSlot,
-      });
+    if (!validateForm()) return;
+
+    const now = new Date().toISOString();
+
+    try {
+      await createAppointment(
+        {
+          ...appointment,
+          lastUpdated: now,
+        },
+        currentUserId
+      );
+      await fetchAppointments();
+      setAppointment({ ...initialAppointmentState });
+      setSelectedAppointmentId(null);
+    } catch (error) {
+      console.error("Error saving appointment:", error.message);
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!isFormValid) return;
-
-    setBookedSlots((prev) => {
-      const updatedSlots = { ...prev };
-      if (!updatedSlots[formData.selectedDate]) {
-        updatedSlots[formData.selectedDate] = [];
-      }
-      updatedSlots[formData.selectedDate] = [
-        ...updatedSlots[formData.selectedDate],
-        formData.selectedTimeSlot,
-      ];
-      return updatedSlots;
-    });
-
-    const newAppointment = {
-      reasonForMeeting: formData.reasonForMeeting,
-      date: formData.selectedDate,
-      time: formData.selectedTimeSlot,
-    };
-
-    setBookedAppointments([...bookedAppointments, newAppointment]);
-
-    console.log("Appointment booked:", formData);
-
-    setFormData({
-      reasonForMeeting: "",
-      selectedDate: "",
-      selectedTimeSlot: null,
-    });
-
-    alert("Appointment booked successfully!");
+  const selectAppointment = (id) => {
+    const selected = appointmentsList.find((a) => a.id === id);
+    if (selected) {
+      setAppointment({ ...selected });
+      setSelectedAppointmentId(id);
+    }
   };
 
-  const formatTimeDisplay = (timeString) => {
-    const [hours, minutes] = timeString.split(":");
-    const hour = parseInt(hours, 10);
-    const ampm = hour >= 12 ? "PM" : "AM";
-    const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
+  const handleCancel = () => {
+    setAppointment({ ...initialAppointmentState });
+    setSelectedAppointmentId(null);
+    setErrors({});
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
   };
 
   return (
-    <>
-      <div className="appointment-container">
-        <h1 className="appointment-title">Schedule an Appointment</h1>
-        <div className="appointment-content">
-          <form className="appointment-form" onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="reasonForMeeting">Reason for Meeting *</label>
-              <textarea
-                id="reasonForMeeting"
-                name="reasonForMeeting"
-                value={formData.reasonForMeeting}
-                onChange={handleInputChange}
-                className={errors.reasonForMeeting ? "error" : ""}
-                rows="4"
-                required
-              ></textarea>
-              {errors.reasonForMeeting && (
-                <div className="error-message">{errors.reasonForMeeting}</div>
-              )}
-            </div>
+    <div className="appointments-container">
+      <header className="appointments-header">
+        <h1>Appointments Management</h1>
+        <p>Manage your appointments</p>
+      </header>
 
-            <div className="form-group">
-              <label htmlFor="selectedDate">Select a Date *</label>
-              <input
-                type="date"
-                id="selectedDate"
-                name="selectedDate"
-                value={formData.selectedDate}
-                onChange={handleDateChange}
-                min={new Date().toISOString().split("T")[0]}
-                required
-              />
-              {errors.selectedDate && (
-                <div className="error-message">{errors.selectedDate}</div>
-              )}
-            </div>
+      <div className="appointments-main">
+        {/* Left Panel: Appointment List and Booking Button */}
+        <section className="appointments-list-section">
+          <div className="section-header">
+            <h2>Your Appointments</h2>
+            <button
+              className="new-appointment-btn"
+              onClick={() => {
+                setAppointment({ ...initialAppointmentState });
+                setSelectedAppointmentId(null);
+              }}
+            >
+              <span>+</span> New Appointment
+            </button>
+          </div>
 
-            {formData.selectedDate && (
-              <div className="time-slot-section">
-                <h3>Available Time Slots</h3>
-                <div className="time-slots-container">
-                  {Object.entries(availableSlots).map(([slot, isAvailable]) => (
-                    <div
-                      key={slot}
-                      className={`time-slot ${
-                        !isAvailable ? "unavailable" : ""
-                      } ${
-                        formData.selectedTimeSlot === slot ? "selected" : ""
-                      }`}
-                      onClick={() => isAvailable && handleTimeSlotSelect(slot)}
-                    >
-                      {formatTimeDisplay(slot)}
-                      {!isAvailable && (
-                        <span className="booked-label">Booked</span>
-                      )}
-                    </div>
-                  ))}
+          {appointmentsList.length === 0 ? (
+            <div className="no-appointments">
+              <p>
+                No appointments found. Create a new appointment to get started.
+              </p>
+            </div>
+          ) : (
+            <div className="appointments-list">
+              {appointmentsList.map((a) => (
+                <div
+                  key={a.id}
+                  className={`appointment-item ${
+                    selectedAppointmentId === a.id ? "selected" : ""
+                  }`}
+                  onClick={() => selectAppointment(a.id)}
+                >
+                  <div className="appointment-header">
+                    <h3>Appointment</h3>
+                  </div>
+                  <div className="appointment-dates">
+                    <span>Scheduled: {formatDate(a.appointmentDate)}</span>
+                    <span>Status: {a.status}</span>
+                  </div>
+                  <p className="appointment-reason">
+                    {a.reason.substring(0, 100)}...
+                  </p>
                 </div>
-                {errors.selectedTimeSlot && (
-                  <div className="error-message">{errors.selectedTimeSlot}</div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Right Panel: Appointment Detail View */}
+        <section className="appointment-detail-section">
+          {selectedAppointmentId ? (
+            <div className="appointment-detail">
+              <div className="detail-header">
+                <h2>Appointment Details</h2>
+              </div>
+
+              <div className="detail-metadata">
+                <div className="metadata-item">
+                  <span className="label">Appointment Date:</span>
+                  <span>{formatDate(appointment.appointmentDate)}</span>
+                </div>
+                <div className="metadata-item">
+                  <span className="label">Status:</span>
+                  <span>{appointment.status}</span>
+                </div>
+                <div className="metadata-item">
+                  <span className="label">Last Updated:</span>
+                  <span>{formatDate(appointment.lastUpdated)}</span>
+                </div>
+              </div>
+
+              <div className="detail-description">
+                <h3>Reason</h3>
+                <p>{appointment.reason}</p>
+              </div>
+
+              <div className="detail-actions">
+                <button onClick={handleCancel}>Close</button>
+              </div>
+            </div>
+          ) : (
+            <form className="appointment-form" onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label htmlFor="appointmentDate">Appointment Date *</label>
+                <input
+                  type="date"
+                  id="appointmentDate"
+                  name="appointmentDate"
+                  value={appointment.appointmentDate}
+                  onChange={handleInputChange}
+                  className={`form-control ${
+                    errors.appointmentDate ? "error" : ""
+                  }`}
+                />
+                {errors.appointmentDate && (
+                  <p className="error-message">{errors.appointmentDate}</p>
                 )}
               </div>
-            )}
-
-            <button
-              type="submit"
-              className={`submit-button ${isFormValid ? "valid" : "disabled"}`}
-              disabled={!isFormValid}
-            >
-              Book Appointment
-            </button>
-          </form>
-
-          <div className="booked-appointments">
-            <h3>Booked Appointments</h3>
-            {bookedAppointments.length === 0 ? (
-              <p>No appointments booked yet.</p>
-            ) : (
-              bookedAppointments.map((appointment, index) => (
-                <div key={index} className="appointment-card">
-                  <p>
-                    <strong>Date:</strong> {appointment.date}
-                  </p>
-                  <p>
-                    <strong>Time:</strong> {formatTimeDisplay(appointment.time)}
-                  </p>
-                  <p>
-                    <strong>Reason:</strong> {appointment.reasonForMeeting}
-                  </p>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
+              <div className="form-group">
+                <label htmlFor="status">Status</label>
+                <select
+                  id="status"
+                  name="status"
+                  value={appointment.status}
+                  onChange={handleInputChange}
+                  className="form-control"
+                >
+                  <option value="Scheduled">Scheduled</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Canceled">Canceled</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="reason">Reason *</label>
+                <textarea
+                  id="reason"
+                  name="reason"
+                  value={appointment.reason}
+                  onChange={handleInputChange}
+                  className={`form-control ${errors.reason ? "error" : ""}`}
+                />
+                {errors.reason && (
+                  <p className="error-message">{errors.reason}</p>
+                )}
+              </div>
+              <div className="form-actions">
+                <button type="submit" className="submit-btn">
+                  Save Appointment
+                </button>
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
+        </section>
       </div>
-    </>
+    </div>
   );
 };
 

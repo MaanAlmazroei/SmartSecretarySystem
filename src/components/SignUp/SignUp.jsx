@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import logo from "../../assets/SSS_Logo.png";
 import "./SignUp.css";
 import { signUp } from "../../services/FirebaseAuth";
-import { addUser } from "../../services/FirebaseDB";
+import { createUser } from "../../services/FirebaseDB";
 import { Link } from "react-router-dom";
 
 const SignUp = () => {
@@ -77,7 +77,7 @@ const SignUp = () => {
     });
 
     return Object.values(newErrors).every(
-      (error) => error === "" && error === true
+      (error) => error === "" || error === true
     );
   };
 
@@ -88,12 +88,11 @@ const SignUp = () => {
       try {
         const userCredential = await signUp(formData.email, formData.password);
         const userData = {
-          id: userCredential.uid,
           firstName: formData.firstName,
           lastName: formData.lastName,
           phone: formData.phone,
         };
-        const user = await addUser(userData);
+        const user = await createUser(userCredential.uid, userData);
         return user;
       } catch (error) {
         console.error("Signup failed:", error.message);

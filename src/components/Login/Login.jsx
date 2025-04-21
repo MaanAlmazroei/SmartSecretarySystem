@@ -34,7 +34,7 @@ function Login() {
     setErrors(newErrors);
 
     return Object.values(newErrors).every(
-      (error) => error === "" && error === true
+      (error) => error === "" || error === true
     );
   };
 

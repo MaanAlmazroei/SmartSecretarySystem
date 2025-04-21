@@ -2,7 +2,6 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 1rem;
-  animation: fadeIn 0.5s ease-out;
 }
 
 .tickets-header {
@@ -10,7 +9,6 @@
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid #e0e0e0;
-  animation: slideDown 0.3s ease-out;
 }
 
 .tickets-header h1 {
@@ -77,7 +75,6 @@
   width: 400px;
   height: 600px;
   overflow: auto;
-  animation: slideInLeft 0.3s ease-out;
 }
 
 .no-tickets {
@@ -121,7 +118,6 @@
     background-color 0.2s ease;
   position: relative;
   overflow: hidden;
-  animation: fadeIn 0.3s ease-out;
   min-height: 6rem;
 }
 
@@ -247,11 +243,6 @@
   width: 800px;
   height: 600px;
   overflow: auto;
-  animation: slideInRight 0.3s ease-out;
-}
-
-.ticket-detail {
-  animation: fadeIn 0.3s ease-out;
 }
 
 .detail-header {
@@ -377,10 +368,6 @@
   background-color: #e0e0e0;
 }
 
-.ticket-form {
-  animation: fadeIn 0.3s ease-out;
-}
-
 .ticket-form h2 {
   font-size: 1.5rem;
   font-weight: 600;
@@ -440,7 +427,6 @@
   color: #d32f2f;
   font-size: 0.8rem;
   margin-top: 0.25rem;
-  animation: shake 0.5s ease-in-out;
 }
 
 .ticket-detail-section select {
@@ -455,7 +441,6 @@
   margin-top: 1.5rem;
   padding-top: 1rem;
   border-top: 1px dashed #e0e0e0;
-  animation: fadeIn 0.3s ease-out;
 }
 
 .feedback-section h3 {
@@ -516,7 +501,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.cancel-btn {
+.clear-btn {
   padding: 1rem;
   background-color: transparent;
   color: #404040;
@@ -527,7 +512,7 @@
   transition: background-color 0.2s ease;
 }
 
-.cancel-btn:hover {
+.clear-btn:hover {
   background-color: #e0e0e0;
 }
 
@@ -553,62 +538,5 @@
 
   .form-actions {
     flex-direction: column;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  20%,
-  60% {
-    transform: translateX(-5px);
-  }
-  40%,
-  80% {
-    transform: translateX(5px);
   }
 }
