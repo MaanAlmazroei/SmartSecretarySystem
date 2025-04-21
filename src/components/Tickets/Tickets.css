@@ -2,6 +2,8 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 1rem;
+  margin-top: 40px;
+  margin-bottom: 40px;
 }
 
 .tickets-header {
@@ -71,7 +73,7 @@
   background-color: #ffffff;
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   width: 400px;
   height: 600px;
   overflow: auto;
@@ -119,16 +121,17 @@
   position: relative;
   overflow: hidden;
   min-height: 6rem;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
 }
 
 .ticket-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .ticket-item.selected {
   background-color: #e0e0e0;
-  border-left: 3px solid #2d2d2d;
+  border-left: 8px solid #2d2d2d;
 }
 
 .ticket-item::after {
@@ -239,7 +242,7 @@
   background-color: #ffffff;
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   width: 800px;
   height: 600px;
   overflow: auto;
@@ -267,6 +270,7 @@
   margin-bottom: 1.5rem;
   padding: 1rem;
   background-color: #f8f8f8;
+  border: 1px solid #404040;
   border-radius: 6px;
 }
 
@@ -295,39 +299,11 @@
 
 .detail-description p {
   background-color: #f8f8f8;
+  border: 1px solid #404040;
   padding: 1rem;
   border-radius: 6px;
   font-size: 0.95rem;
   line-height: 1.6;
-}
-
-.detail-feedback {
-  margin-bottom: 1.5rem;
-}
-
-.detail-feedback h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #404040;
-  margin-bottom: 0.5rem;
-  margin-top: 1.5rem;
-}
-
-.detail-feedback p {
-  background-color: #f8f8f8;
-  padding: 1rem;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  font-style: italic;
-}
-
-.static-stars {
-  font-size: 1.5rem;
-  color: #e0e0e0;
-}
-
-.static-stars .star.filled {
-  color: #2d2d2d;
 }
 
 .detail-actions {
@@ -401,7 +377,7 @@
 .ticket-detail-section select {
   width: 100%;
   padding: 0.5rem 1rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #404040;
   border-radius: 4px;
   font-size: 1rem;
   color: #1a1a1a;
@@ -435,45 +411,6 @@
   background-position: right 0.5rem center;
   background-size: 1.2em;
   padding-right: 2.5rem;
-}
-
-.feedback-section {
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px dashed #e0e0e0;
-}
-
-.feedback-section h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #404040;
-  margin-bottom: 0.25rem;
-}
-
-.feedback-section p {
-  font-size: 0.9rem;
-  color: #808080;
-  margin-bottom: 1rem;
-}
-
-.rating-stars {
-  display: flex;
-  gap: 0.25rem;
-  font-size: 1.8rem;
-  cursor: pointer;
-}
-
-.rating-stars .star {
-  color: #e0e0e0;
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.rating-stars .star:hover {
-  transform: scale(1.1);
-}
-
-.rating-stars .star.filled {
-  color: #2d2d2d;
 }
 
 .form-actions {
