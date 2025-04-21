@@ -1,65 +1,66 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./Appointments.css";
-import { currentUser } from "../../services/FirebaseAuth";
-import {
-  getUserAllAppointments,
-  createAppointment,
-} from "../../services/FirebaseDB";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../services/FirebaseConfig";
 
 const Appointments = () => {
   const initialAppointmentState = {
-    appointmentDate: "",
+    title: "",
+    date: "",
+    time: "",
+    description: "",
     status: "Scheduled",
-    reason: "",
-    lastUpdated: "",
   };
 
-  const [appointment, setAppointment] = useState({
-    ...initialAppointmentState,
-  });
+  const timeSlots = [
+    "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", 
+    "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM",
+    "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM",
+    "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM"
+  ];
+
+  const [appointment, setAppointment] = useState({ ...initialAppointmentState });
   const [errors, setErrors] = useState({});
-  const [appointmentsList, setAppointmentsList] = useState([]);
+  const [appointmentsList, setAppointmentsList] = useState([
+    {
+      id: "1",
+      title: "Academic Advising",
+      date: "2025-04-23",
+      time: "10:00 AM",
+      status: "Scheduled",
+      description: "Discuss course registration and academic planning.",
+      createdAt: "2025-04-15T10:30:00",
+    },
+    {
+      id: "2",
+      title: "Graduation Check",
+      date: "2025-04-18",
+      time: "01:30 PM",
+      status: "Completed",
+      description: "Verify eligibility for graduation.",
+      createdAt: "2025-04-10T14:15:00",
+      updatedAt: "2025-04-18T13:45:00",
+    },
+  ]);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
-  const [currentUserId, setCurrentUserId] = useState(currentUser());
-
-  const fetchAppointments = async () => {
-    if (currentUserId) {
-      try {
-        const appointments = await getUserAllAppointments(currentUserId);
-        setAppointmentsList(appointments);
-      } catch (error) {
-        console.error("Error fetching appointments:", error.message);
-      }
-    }
-  };
-
-  useEffect(() => {
-    fetchAppointments();
-  }, [currentUserId]);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setCurrentUserId(user.uid);
-      } else {
-        setCurrentUserId(null);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!appointment.appointmentDate.trim()) {
-      newErrors.appointmentDate = "Appointment date is required";
+    if (!appointment.title.trim()) {
+      newErrors.title = "Title is required";
     }
 
-    if (!appointment.reason.trim()) {
-      newErrors.reason = "Reason is required";
+    if (!appointment.date) {
+      newErrors.date = "Date is required";
+    }
+
+    if (!appointment.time) {
+      newErrors.time = "Time is required";
+    }
+
+    if (!appointment.description.trim()) {
+      newErrors.description = "Description is required";
+    } else if (appointment.description.length < 10) {
+      newErrors.description = "Description should be at least 10 characters";
     }
 
     setErrors(newErrors);
@@ -74,27 +75,29 @@ const Appointments = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleTimeSelect = (time) => {
+    setAppointment((prev) => ({
+      ...prev,
+      time: time,
+    }));
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!validateForm()) return;
 
     const now = new Date().toISOString();
+    const newAppointment = {
+      ...appointment,
+      id: Date.now().toString(),
+      createdAt: now,
+      updatedAt: now,
+    };
 
-    try {
-      await createAppointment(
-        {
-          ...appointment,
-          lastUpdated: now,
-        },
-        currentUserId
-      );
-      await fetchAppointments();
-      setAppointment({ ...initialAppointmentState });
-      setSelectedAppointmentId(null);
-    } catch (error) {
-      console.error("Error saving appointment:", error.message);
-    }
+    setAppointmentsList([newAppointment, ...appointmentsList]);
+    setAppointment({ ...initialAppointmentState });
+    setSelectedAppointmentId(null);
   };
 
   const selectAppointment = (id) => {
@@ -124,15 +127,28 @@ const Appointments = () => {
     }).format(date);
   };
 
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "Scheduled":
+        return "status-scheduled";
+      case "Completed":
+        return "status-completed";
+      case "Cancelled":
+        return "status-cancelled";
+      default:
+        return "";
+    }
+  };
+
   return (
     <div className="appointments-container">
       <header className="appointments-header">
         <h1>Appointments Management</h1>
-        <p>Manage your appointments</p>
+        <p>Schedule and track appointments</p>
       </header>
 
       <div className="appointments-main">
-        {/* Left Panel: Appointment List and Booking Button */}
+        {/* Left Panel: Appointment List and New Appointment Button */}
         <section className="appointments-list-section">
           <div className="section-header">
             <h2>Your Appointments</h2>
@@ -149,9 +165,7 @@ const Appointments = () => {
 
           {appointmentsList.length === 0 ? (
             <div className="no-appointments">
-              <p>
-                No appointments found. Create a new appointment to get started.
-              </p>
+              <p>No appointments found. Create a new appointment to get started.</p>
             </div>
           ) : (
             <div className="appointments-list">
@@ -164,14 +178,20 @@ const Appointments = () => {
                   onClick={() => selectAppointment(a.id)}
                 >
                   <div className="appointment-header">
-                    <h3>Appointment</h3>
+                    <h3>{a.title}</h3>
+                    <span
+                      className={`appointment-status ${getStatusClass(a.status)}`}
+                    >
+                      {a.status}
+                    </span>
                   </div>
                   <div className="appointment-dates">
-                    <span>Scheduled: {formatDate(a.appointmentDate)}</span>
-                    <span>Status: {a.status}</span>
+                    <span>Date: {a.date} at {a.time}</span>
+                    <span>Created: {formatDate(a.createdAt)}</span>
                   </div>
-                  <p className="appointment-reason">
-                    {a.reason.substring(0, 100)}...
+                  <p className="appointment-description">
+                    {a.description.substring(0, 100)}
+                    {a.description.length > 100 ? "..." : ""}
                   </p>
                 </div>
               ))}
@@ -184,27 +204,38 @@ const Appointments = () => {
           {selectedAppointmentId ? (
             <div className="appointment-detail">
               <div className="detail-header">
-                <h2>Appointment Details</h2>
+                <h2>{appointment.title}</h2>
+                <span
+                  className={`appointment-status ${getStatusClass(appointment.status)}`}
+                >
+                  {appointment.status}
+                </span>
               </div>
 
               <div className="detail-metadata">
                 <div className="metadata-item">
-                  <span className="label">Appointment Date:</span>
-                  <span>{formatDate(appointment.appointmentDate)}</span>
+                  <span className="label">Date:</span>
+                  <span>{appointment.date}</span>
                 </div>
                 <div className="metadata-item">
-                  <span className="label">Status:</span>
-                  <span>{appointment.status}</span>
+                  <span className="label">Time:</span>
+                  <span>{appointment.time}</span>
                 </div>
                 <div className="metadata-item">
-                  <span className="label">Last Updated:</span>
-                  <span>{formatDate(appointment.lastUpdated)}</span>
+                  <span className="label">Created on:</span>
+                  <span>{formatDate(appointment.createdAt)}</span>
                 </div>
+                {appointment.createdAt !== appointment.updatedAt && (
+                  <div className="metadata-item">
+                    <span className="label">Last updated:</span>
+                    <span>{formatDate(appointment.updatedAt)}</span>
+                  </div>
+                )}
               </div>
 
               <div className="detail-description">
-                <h3>Reason</h3>
-                <p>{appointment.reason}</p>
+                <h3>Description</h3>
+                <p>{appointment.description}</p>
               </div>
 
               <div className="detail-actions">
@@ -214,58 +245,79 @@ const Appointments = () => {
           ) : (
             <form className="appointment-form" onSubmit={handleSubmit}>
               <div className="form-group">
-                <label htmlFor="appointmentDate">Appointment Date *</label>
+                <label htmlFor="title">Appointment Title *</label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value={appointment.title}
+                  onChange={handleInputChange}
+                  className={`form-control ${errors.title ? "error" : ""}`}
+                />
+                {errors.title && (
+                  <p className="error-message">{errors.title}</p>
+                )}
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="date">Date *</label>
                 <input
                   type="date"
-                  id="appointmentDate"
-                  name="appointmentDate"
-                  value={appointment.appointmentDate}
+                  id="date"
+                  name="date"
+                  value={appointment.date}
+                  onChange={handleInputChange}
+                  className={`form-control ${errors.date ? "error" : ""}`}
+                />
+                {errors.date && (
+                  <p className="error-message">{errors.date}</p>
+                )}
+              </div>
+              
+              <div className="form-group">
+                <label>Time Slot *</label>
+                <div className="time-slots-container">
+                  {timeSlots.map((time) => (
+                    <div
+                      key={time}
+                      className={`time-slot ${appointment.time === time ? "selected" : ""}`}
+                      onClick={() => handleTimeSelect(time)}
+                    >
+                      {time}
+                    </div>
+                  ))}
+                </div>
+                {errors.time && (
+                  <p className="error-message">{errors.time}</p>
+                )}
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="description">Description *</label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={appointment.description}
                   onChange={handleInputChange}
                   className={`form-control ${
-                    errors.appointmentDate ? "error" : ""
+                    errors.description ? "error" : ""
                   }`}
                 />
-                {errors.appointmentDate && (
-                  <p className="error-message">{errors.appointmentDate}</p>
+                {errors.description && (
+                  <p className="error-message">{errors.description}</p>
                 )}
               </div>
-              <div className="form-group">
-                <label htmlFor="status">Status</label>
-                <select
-                  id="status"
-                  name="status"
-                  value={appointment.status}
-                  onChange={handleInputChange}
-                  className="form-control"
-                >
-                  <option value="Scheduled">Scheduled</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Canceled">Canceled</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label htmlFor="reason">Reason *</label>
-                <textarea
-                  id="reason"
-                  name="reason"
-                  value={appointment.reason}
-                  onChange={handleInputChange}
-                  className={`form-control ${errors.reason ? "error" : ""}`}
-                />
-                {errors.reason && (
-                  <p className="error-message">{errors.reason}</p>
-                )}
-              </div>
+              
               <div className="form-actions">
                 <button type="submit" className="submit-btn">
-                  Save Appointment
+                  Schedule
                 </button>
                 <button
                   type="button"
-                  className="cancel-btn"
+                  className="clear-btn"
                   onClick={handleCancel}
                 >
-                  Cancel
+                  Clear
                 </button>
               </div>
             </form>
