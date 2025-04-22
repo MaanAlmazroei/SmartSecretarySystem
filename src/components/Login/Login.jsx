@@ -50,7 +50,7 @@ function Login() {
         toast.success("Logged in successfully!");
         setTimeout(() => {
           navigate("/");
-        }, 1000);
+        }, 500);
         return user;
       } catch (error) {
         toast.error("Login failed!");

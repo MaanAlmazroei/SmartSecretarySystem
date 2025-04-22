@@ -1,46 +1,74 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Appointments.css";
+import {
+  createAppointment,
+  getUserAllAppointments,
+} from "../../services/FirebaseDB";
+import { currentUser } from "../../services/FirebaseAuth";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../services/FirebaseConfig";
 
 const Appointments = () => {
   const initialAppointmentState = {
     title: "",
-    date: "",
-    time: "",
+    appointmentDate: "",
+    appointmentTime: "",
     description: "",
-    status: "Scheduled",
   };
 
   const timeSlots = [
-    "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", 
-    "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM",
-    "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM",
-    "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM"
+    "09:00 AM",
+    "09:30 AM",
+    "10:00 AM",
+    "10:30 AM",
+    "11:00 AM",
+    "11:30 AM",
+    "12:00 PM",
+    "12:30 PM",
+    "01:00 PM",
+    "01:30 PM",
+    "02:00 PM",
+    "02:30 PM",
+    "03:00 PM",
+    "03:30 PM",
+    "04:00 PM",
+    "04:30 PM",
   ];
 
-  const [appointment, setAppointment] = useState({ ...initialAppointmentState });
+  const [appointment, setAppointment] = useState({
+    ...initialAppointmentState,
+  });
   const [errors, setErrors] = useState({});
-  const [appointmentsList, setAppointmentsList] = useState([
-    {
-      id: "1",
-      title: "Academic Advising",
-      date: "2025-04-23",
-      time: "10:00 AM",
-      status: "Scheduled",
-      description: "Discuss course registration and academic planning.",
-      createdAt: "2025-04-15T10:30:00",
-    },
-    {
-      id: "2",
-      title: "Graduation Check",
-      date: "2025-04-18",
-      time: "01:30 PM",
-      status: "Completed",
-      description: "Verify eligibility for graduation.",
-      createdAt: "2025-04-10T14:15:00",
-      updatedAt: "2025-04-18T13:45:00",
-    },
-  ]);
+  const [appointmentsList, setAppointmentsList] = useState([]);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(currentUser());
+
+  const fetchAppointments = async () => {
+    if (currentUserId) {
+      try {
+        const appointments = await getUserAllAppointments(currentUserId);
+        setAppointmentsList(appointments);
+      } catch (error) {
+        console.error("Error fetching appointments:", error.message);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchAppointments();
+  }, [currentUserId]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUserId(user.uid);
+      } else {
+        setCurrentUserId(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const validateForm = () => {
     const newErrors = {};
@@ -48,15 +76,12 @@ const Appointments = () => {
     if (!appointment.title.trim()) {
       newErrors.title = "Title is required";
     }
-
-    if (!appointment.date) {
-      newErrors.date = "Date is required";
+    if (!appointment.appointmentDate) {
+      newErrors.appointmentDate = "Date is required";
     }
-
-    if (!appointment.time) {
-      newErrors.time = "Time is required";
+    if (!appointment.appointmentTime) {
+      newErrors.appointmentTime = "Time is required";
     }
-
     if (!appointment.description.trim()) {
       newErrors.description = "Description is required";
     } else if (appointment.description.length < 10) {
@@ -78,32 +103,55 @@ const Appointments = () => {
   const handleTimeSelect = (time) => {
     setAppointment((prev) => ({
       ...prev,
-      time: time,
+      appointmentTime: time,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) return;
 
     const now = new Date().toISOString();
-    const newAppointment = {
-      ...appointment,
-      id: Date.now().toString(),
-      createdAt: now,
-      updatedAt: now,
-    };
 
-    setAppointmentsList([newAppointment, ...appointmentsList]);
-    setAppointment({ ...initialAppointmentState });
-    setSelectedAppointmentId(null);
+    if (!currentUserId) {
+      console.error("No user logged in.");
+      return;
+    }
+
+    try {
+      await createAppointment(
+        {
+          title: appointment.title,
+          description: appointment.description,
+          appointmentTime: appointment.appointmentTime,
+          appointmentDate: appointment.appointmentDate,
+          status: "Scheduled",
+          feedback: "",
+          lastUpdatedDate: now,
+          createdAt: now,
+          userId: currentUserId,
+        },
+        currentUserId
+      );
+
+      await fetchAppointments();
+      setAppointment({ ...initialAppointmentState });
+      setSelectedAppointmentId(null);
+    } catch (error) {
+      console.error("Error creating appointment:", error.message);
+    }
   };
 
   const selectAppointment = (id) => {
     const selected = appointmentsList.find((a) => a.id === id);
     if (selected) {
-      setAppointment({ ...selected });
+      setAppointment({
+        title: selected.title,
+        description: selected.description,
+        appointmentTime: selected.appointmentTime,
+        appointmentDate: selected.appointmentDate,
+      });
       setSelectedAppointmentId(id);
     }
   };
@@ -165,7 +213,9 @@ const Appointments = () => {
 
           {appointmentsList.length === 0 ? (
             <div className="no-appointments">
-              <p>No appointments found. Create a new appointment to get started.</p>
+              <p>
+                No appointments found. Create a new appointment to get started.
+              </p>
             </div>
           ) : (
             <div className="appointments-list">
@@ -180,13 +230,14 @@ const Appointments = () => {
                   <div className="appointment-header">
                     <h3>{a.title}</h3>
                     <span
-                      className={`appointment-status ${getStatusClass(a.status)}`}
+                      className={`appointment-status ${getStatusClass(
+                        a.status
+                      )}`}
                     >
                       {a.status}
                     </span>
                   </div>
                   <div className="appointment-dates">
-                    <span>Date: {a.date} at {a.time}</span>
                     <span>Created: {formatDate(a.createdAt)}</span>
                   </div>
                   <p className="appointment-description">
@@ -205,32 +256,17 @@ const Appointments = () => {
             <div className="appointment-detail">
               <div className="detail-header">
                 <h2>{appointment.title}</h2>
-                <span
-                  className={`appointment-status ${getStatusClass(appointment.status)}`}
-                >
-                  {appointment.status}
-                </span>
               </div>
 
               <div className="detail-metadata">
                 <div className="metadata-item">
                   <span className="label">Date:</span>
-                  <span>{appointment.date}</span>
+                  <span>{appointment.appointmentDate}</span>
                 </div>
                 <div className="metadata-item">
                   <span className="label">Time:</span>
-                  <span>{appointment.time}</span>
+                  <span>{appointment.appointmentTime}</span>
                 </div>
-                <div className="metadata-item">
-                  <span className="label">Created on:</span>
-                  <span>{formatDate(appointment.createdAt)}</span>
-                </div>
-                {appointment.createdAt !== appointment.updatedAt && (
-                  <div className="metadata-item">
-                    <span className="label">Last updated:</span>
-                    <span>{formatDate(appointment.updatedAt)}</span>
-                  </div>
-                )}
               </div>
 
               <div className="detail-description">
@@ -258,40 +294,44 @@ const Appointments = () => {
                   <p className="error-message">{errors.title}</p>
                 )}
               </div>
-              
+
               <div className="form-group">
-                <label htmlFor="date">Date *</label>
+                <label htmlFor="appointmentDate">Date *</label>
                 <input
                   type="date"
-                  id="date"
-                  name="date"
-                  value={appointment.date}
+                  id="appointmentDate"
+                  name="appointmentDate"
+                  value={appointment.appointmentDate}
                   onChange={handleInputChange}
-                  className={`form-control ${errors.date ? "error" : ""}`}
+                  className={`form-control ${
+                    errors.appointmentDate ? "error" : ""
+                  }`}
                 />
-                {errors.date && (
-                  <p className="error-message">{errors.date}</p>
+                {errors.appointmentDate && (
+                  <p className="error-message">{errors.appointmentDate}</p>
                 )}
               </div>
-              
+
               <div className="form-group">
                 <label>Time Slot *</label>
                 <div className="time-slots-container">
                   {timeSlots.map((time) => (
                     <div
                       key={time}
-                      className={`time-slot ${appointment.time === time ? "selected" : ""}`}
+                      className={`time-slot ${
+                        appointment.appointmentTime === time ? "selected" : ""
+                      }`}
                       onClick={() => handleTimeSelect(time)}
                     >
                       {time}
                     </div>
                   ))}
                 </div>
-                {errors.time && (
-                  <p className="error-message">{errors.time}</p>
+                {errors.appointmentTime && (
+                  <p className="error-message">{errors.appointmentTime}</p>
                 )}
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="description">Description *</label>
                 <textarea
@@ -307,7 +347,7 @@ const Appointments = () => {
                   <p className="error-message">{errors.description}</p>
                 )}
               </div>
-              
+
               <div className="form-actions">
                 <button type="submit" className="submit-btn">
                   Schedule
