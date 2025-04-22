@@ -4,7 +4,7 @@ import {
   createAppointment,
   getUserAllAppointments,
 } from "../../services/FirebaseDB";
-import { currentUser } from "../../services/FirebaseAuth";
+import { getCurrentUser } from "../../services/FirebaseAuth";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../services/FirebaseConfig";
 
@@ -41,29 +41,31 @@ const Appointments = () => {
   const [errors, setErrors] = useState({});
   const [appointmentsList, setAppointmentsList] = useState([]);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
-  const [currentUserId, setCurrentUserId] = useState(currentUser());
+  const [currentUser, setCurrentUser] = useState(getCurrentUser());
 
   const fetchAppointments = async () => {
-    if (currentUserId) {
+    if (currentUser?.uid) {
       try {
-        const appointments = await getUserAllAppointments(currentUserId);
+        const appointments = await getUserAllAppointments(currentUser.uid);
         setAppointmentsList(appointments);
       } catch (error) {
         console.error("Error fetching appointments:", error.message);
       }
+    } else {
+      setAppointmentsList([]);
     }
   };
 
   useEffect(() => {
     fetchAppointments();
-  }, [currentUserId]);
+  }, [currentUser?.uid]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setCurrentUserId(user.uid);
+        setCurrentUser(user);
       } else {
-        setCurrentUserId(null);
+        setCurrentUser(null);
       }
     });
 
@@ -114,7 +116,7 @@ const Appointments = () => {
 
     const now = new Date().toISOString();
 
-    if (!currentUserId) {
+    if (!currentUser) {
       console.error("No user logged in.");
       return;
     }
@@ -130,9 +132,9 @@ const Appointments = () => {
           feedback: "",
           lastUpdatedDate: now,
           createdAt: now,
-          userId: currentUserId,
+          userId: currentUser.uid,
         },
-        currentUserId
+        currentUser.uid
       );
 
       await fetchAppointments();

@@ -61,44 +61,38 @@ const Header = () => {
                 Home
               </NavLink>
             </li>
-            {isLoggedIn && (
-              <>
-                <li>
-                  <NavLink
-                    to="/tickets"
-                    className={({ isActive }) => (isActive ? "nav-active" : "")}
-                  >
-                    Tickets
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/appointments"
-                    className={({ isActive }) => (isActive ? "nav-active" : "")}
-                  >
-                    Appointments
-                  </NavLink>
-                </li>
-              </>
-            )}
             <li>
               <NavLink
-                to="/knowledge-base"
+                to="/tickets"
                 className={({ isActive }) => (isActive ? "nav-active" : "")}
               >
-                Knowledge Base
+                Tickets
               </NavLink>
             </li>
-            {isLoggedIn && (
-              <li>
-                <NavLink
-                  to="/profile"
-                  className={({ isActive }) => (isActive ? "nav-active" : "")}
-                >
-                  Profile
-                </NavLink>
-              </li>
-            )}
+            <li>
+              <NavLink
+                to="/appointments"
+                className={({ isActive }) => (isActive ? "nav-active" : "")}
+              >
+                Appointments
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/resources"
+                className={({ isActive }) => (isActive ? "nav-active" : "")}
+              >
+                Resources
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/profile"
+                className={({ isActive }) => (isActive ? "nav-active" : "")}
+              >
+                Profile
+              </NavLink>
+            </li>
           </ul>
         </div>
       </nav>

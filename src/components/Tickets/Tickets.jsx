@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Tickets.css";
-import { currentUser } from "../../services/FirebaseAuth";
+import { getCurrentUser } from "../../services/FirebaseAuth";
 import { getUserAllTickets, createTicket } from "../../services/FirebaseDB";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../services/FirebaseConfig";
@@ -18,29 +18,31 @@ const Tickets = () => {
   const [errors, setErrors] = useState({});
   const [ticketsList, setTicketsList] = useState([]);
   const [selectedTicketId, setSelectedTicketId] = useState(null);
-  const [currentUserId, setCurrentUserId] = useState(currentUser());
+  const [currentUser, setCurrentUser] = useState(getCurrentUser());
 
   const fetchTickets = async () => {
-    if (currentUserId) {
+    if (currentUser?.uid) {
       try {
-        const tickets = await getUserAllTickets(currentUserId);
+        const tickets = await getUserAllTickets(currentUser.uid);
         setTicketsList(tickets);
       } catch (error) {
         console.error("Error fetching tickets:", error.message);
       }
+    } else {
+      setTicketsList([]);
     }
   };
 
   useEffect(() => {
     fetchTickets();
-  }, [currentUserId]);
+  }, [currentUser?.uid]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setCurrentUserId(user.uid);
+        setCurrentUser(user);
       } else {
-        setCurrentUserId(null);
+        setCurrentUser(null);
       }
     });
 
@@ -86,7 +88,7 @@ const Tickets = () => {
           submissionDate: now,
           updateDate: now,
         },
-        currentUserId
+        currentUser.uid
       );
 
       await fetchTickets();

@@ -42,12 +42,12 @@ export const logOut = async () => {
   }
 };
 
-export const currentUser = () => {
+export const getCurrentUser = () => {
   const auth = getAuth();
   const currentUser = auth.currentUser;
 
   if (currentUser) {
-    return currentUser.uid;
+    return currentUser;
   } else {
     return null;
   }

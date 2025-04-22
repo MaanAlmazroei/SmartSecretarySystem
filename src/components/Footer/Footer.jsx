@@ -29,8 +29,8 @@ const Footer = () => {
               </Link>
             </li>
             <li>
-              <Link to="/knowledge-base" className="footer-link">
-                Knowledge Base
+              <Link to="/resources" className="footer-link">
+                Resources
               </Link>
             </li>
             <li>
@@ -45,18 +45,15 @@ const Footer = () => {
           <h4 className="footer-subheading">Department Contact</h4>
           <address className="footer-address">
             <p>IT Department Office</p>
-            <p>University Building, Room 205</p>
-            <p>Email: it.secretary@university.edu</p>
-            <p>Office Hours: 8AM - 3PM</p>
+            <p>FCIT Building, Room #</p>
+            <p>Email: fcit-it@kau.edu.sa</p>
+            <p>Office Hours: #AM - #PM</p>
           </address>
         </div>
       </div>
 
       <div className="footer-bottom">
-        <p>
-          &copy; {currentYear} Smart Secretary System - IT Department. All
-          rights reserved.
-        </p>
+        <p>&copy; {currentYear} Smart Secretary System. All rights reserved.</p>
       </div>
     </footer>
   );

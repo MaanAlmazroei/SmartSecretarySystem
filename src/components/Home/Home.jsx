@@ -1,7 +1,6 @@
 import "./Home.css";
 import FCIT from "../../assets/kau_fcit_building.jpg";
 import { FaRobot, FaCalendarCheck, FaTicketAlt, FaBook } from "react-icons/fa";
-import { Link } from "react-router-dom";
 
 const Home = () => {
   return (
@@ -45,7 +44,7 @@ const Home = () => {
 
           <div className="feature-card">
             <FaBook className="feature-icon" />
-            <h3>Self-Service Portal</h3>
+            <h3>Resources</h3>
             <p>Learn about university services and processes.</p>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "./Portal.css";
+import "./Resources.css";
 
-const Portal = () => {
+const Resources = () => {
   const [activeCategory, setActiveCategory] = useState(null);
   const [activeSection, setActiveSection] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
@@ -47,7 +47,7 @@ const Portal = () => {
 
   return (
     <div className="portal-container">
-      <h1 className="portal-heading">Self Service Portal</h1>
+      <h1 className="portal-heading">Resources</h1>
 
       <div className="portal-searchWrapper">
         <input
@@ -114,4 +114,4 @@ const Portal = () => {
   );
 };
 
-export default Portal;
+export default Resources;
