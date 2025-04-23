@@ -11,9 +11,10 @@ import SignUp from "./components/SignUp/SignUp";
 import Login from "./components/Login/Login";
 import Resources from "./components/SelfServicePortal/Resources";
 import Profile from "./components/Profile/Profile";
-import Tickets from "./components/Tickets/Tickets";
+import Tickets from "./components/Tickets/UserTickets/Tickets.jsx";
 import Appointments from "./components/Appointments/Appointments";
 import { getCurrentUser } from "./services/FirebaseAuth";
+import SecretaryTickets from "./components/Tickets/SecretaryTickets/SecretaryTickets.jsx";
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = !!getCurrentUser();
@@ -36,6 +37,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           <Route path="/resources" element={<Resources />} />
+          <Route path="/SecretaryTickets" element={<SecretaryTickets />} />
 
           {/* Protected Routes */}
           <Route

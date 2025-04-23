@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./Tickets.css";
-import { getCurrentUser } from "../../services/FirebaseAuth";
-import { getUserAllTickets, createTicket } from "../../services/FirebaseDB";
+import { getCurrentUser } from "../../../services/FirebaseAuth"; 
+import { getUserAllTickets, createTicket } from "../../../services/FirebaseDB";  
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../services/FirebaseConfig";
+import { auth } from "../../../services/FirebaseConfig"; 
 
 const Tickets = () => {
   const initialTicketState = {
