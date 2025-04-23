@@ -174,15 +174,15 @@ const SecretaryTickets = () => {
   const getStatusClass = (status) => {
     switch (status) {
       case "In Progress":
-        return "status-in-progress";
+        return "SecretaryTicket-status-in-progress";
       case "Closed":
-        return "status-closed";
+        return "SecretaryTicket-status-closed";
       case "Resolved":
-        return "status-resolved";
+        return "SecretaryTicket-status-resolved";
       case "Open":
-        return "status-open";
+        return "SecretaryTicket-status-open";
       case "New":
-        return "status-new";
+        return "SecretaryTicket-status-new";
       default:
         return "";
     }
@@ -193,31 +193,31 @@ const SecretaryTickets = () => {
     
     switch (priority.toLowerCase()) {
       case "high":
-        return "priority-high";
+        return "SecretaryTicket-priority-high";
       case "medium":
-        return "priority-medium";
+        return "SecretaryTicket-priority-medium";
       case "low":
-        return "priority-low";
+        return "SecretaryTicket-priority-low";
       default:
         return "";
     }
   };
 
   return (
-    <div className="secretary-tickets-container">
-      <header className="secretary-tickets-header">
+    <div className="SecretaryTicket-container">
+      <header className="SecretaryTicket-header">
         <h1>Secretary Tickets Dashboard</h1>
         <p>Manage and respond to all user support tickets</p>
       </header>
 
-      <div className="tickets-filters">
-        <div className="filter-group">
+      <div className="SecretaryTicket-filters">
+        <div className="SecretaryTicket-filter-group">
           <label htmlFor="statusFilter">Filter by Status:</label>
           <select 
             id="statusFilter" 
             value={statusFilter} 
             onChange={handleStatusFilterChange}
-            className="filter-select"
+            className="SecretaryTicket-filter-select"
           >
             <option value="All">All Statuses</option>
             <option value="New">New</option>
@@ -228,7 +228,7 @@ const SecretaryTickets = () => {
           </select>
         </div>
         
-        <div className="filter-group search-group">
+        <div className="SecretaryTicket-filter-group SecretaryTicket-search-group">
           <label htmlFor="ticketSearch">Search Tickets:</label>
           <input
             type="text"
@@ -236,62 +236,62 @@ const SecretaryTickets = () => {
             placeholder="Search by title, description or user ID"
             value={searchTerm}
             onChange={handleSearchChange}
-            className="search-input"
+            className="SecretaryTicket-search-input"
           />
         </div>
       </div>
 
-      <div className="secretary-tickets-main">
+      <div className="SecretaryTicket-main">
         {/* Left Panel: Tickets List */}
-        <section className="secretary-tickets-list-section">
-          <div className="section-header">
+        <section className="SecretaryTicket-list-section">
+          <div className="SecretaryTicket-section-header">
             <h2>All Tickets</h2>
-            <span className="ticket-count">{filteredTickets.length} tickets</span>
+            <span className="SecretaryTicket-ticket-count">{filteredTickets.length} tickets</span>
           </div>
 
           {loading ? (
-            <div className="loading-indicator">
+            <div className="SecretaryTicket-loading-indicator">
               <p>Loading tickets...</p>
             </div>
           ) : filteredTickets.length === 0 ? (
-            <div className="no-tickets">
+            <div className="SecretaryTicket-no-tickets">
               <p>No tickets found matching your criteria.</p>
             </div>
           ) : (
-            <div className="tickets-list">
+            <div className="SecretaryTicket-tickets-list">
               {filteredTickets.map((ticket) => (
                 <div
                   key={ticket.id}
-                  className={`ticket-item ${
-                    selectedTicketId === ticket.id ? "selected" : ""
+                  className={`SecretaryTicket-ticket-item ${
+                    selectedTicketId === ticket.id ? "SecretaryTicket-selected" : ""
                   }`}
                   onClick={() => selectTicket(ticket.id)}
                 >
-                  <div className="ticket-header">
+                  <div className="SecretaryTicket-ticket-header">
                     <h3>{ticket.title}</h3>
                     <span
-                      className={`ticket-status ${getStatusClass(ticket.status)}`}
+                      className={`SecretaryTicket-ticket-status ${getStatusClass(ticket.status)}`}
                     >
                       {ticket.status}
                     </span>
                   </div>
                   {ticket.priority && (
-                    <div className="ticket-priority">
-                      <span className={`priority-indicator ${getPriorityClass(ticket.priority)}`}>
+                    <div className="SecretaryTicket-ticket-priority">
+                      <span className={`SecretaryTicket-priority-indicator ${getPriorityClass(ticket.priority)}`}>
                         {ticket.priority}
                       </span>
                     </div>
                   )}
-                  <div className="ticket-dates">
+                  <div className="SecretaryTicket-ticket-dates">
                     <span>Created: {formatDate(ticket.submissionDate)}</span>
                     {ticket.submissionDate !== ticket.updateDate && (
                       <span>Updated: {formatDate(ticket.updateDate)}</span>
                     )}
                   </div>
-                  <p className="ticket-description">
+                  <p className="SecretaryTicket-ticket-description">
                     {ticket.description.substring(0, 80)}...
                   </p>
-                  <div className="ticket-user-info">
+                  <div className="SecretaryTicket-ticket-user-info">
                     <span>User ID: {ticket.userId ? ticket.userId.substring(0, 8) + '...' : 'Unknown'}</span>
                   </div>
                 </div>
@@ -301,78 +301,78 @@ const SecretaryTickets = () => {
         </section>
 
         {/* Right Panel: Ticket Detail View */}
-        <section className="secretary-ticket-detail-section">
+        <section className="SecretaryTicket-detail-section">
           {selectedTicketId && selectedTicket ? (
-            <div className="ticket-detail">
-              <div className="detail-header">
+            <div className="SecretaryTicket-detail">
+              <div className="SecretaryTicket-detail-header">
                 <h2>{selectedTicket.title}</h2>
-                <div className="status-actions">
-                  <span className={`ticket-status ${getStatusClass(selectedTicket.status)}`}>
+                <div className="SecretaryTicket-status-actions">
+                  <span className={`SecretaryTicket-ticket-status ${getStatusClass(selectedTicket.status)}`}>
                     {selectedTicket.status}
                   </span>
-                  <button className="close-detail-btn" onClick={closeTicketDetails}>×</button>
+                  <button className="SecretaryTicket-close-detail-btn" onClick={closeTicketDetails}>×</button>
                 </div>
               </div>
 
-              <div className="detail-metadata">
-                <div className="metadata-item">
-                  <span className="label">Submitted by:</span>
+              <div className="SecretaryTicket-detail-metadata">
+                <div className="SecretaryTicket-metadata-item">
+                  <span className="SecretaryTicket-label">Submitted by:</span>
                   <span>{selectedTicket.userId || 'Unknown'}</span>
                 </div>
-                <div className="metadata-item">
-                  <span className="label">Submitted on:</span>
+                <div className="SecretaryTicket-metadata-item">
+                  <span className="SecretaryTicket-label">Submitted on:</span>
                   <span>{formatDate(selectedTicket.submissionDate)}</span>
                 </div>
                 {selectedTicket.submissionDate !== selectedTicket.updateDate && (
-                  <div className="metadata-item">
-                    <span className="label">Last updated:</span>
+                  <div className="SecretaryTicket-metadata-item">
+                    <span className="SecretaryTicket-label">Last updated:</span>
                     <span>{formatDate(selectedTicket.updateDate)}</span>
                   </div>
                 )}
                 {selectedTicket.priority && (
-                  <div className="metadata-item">
-                    <span className="label">Priority:</span>
-                    <span className={`priority-value ${getPriorityClass(selectedTicket.priority)}`}>
+                  <div className="SecretaryTicket-metadata-item">
+                    <span className="SecretaryTicket-label">Priority:</span>
+                    <span className={`SecretaryTicket-priority-value ${getPriorityClass(selectedTicket.priority)}`}>
                       {selectedTicket.priority}
                     </span>
                   </div>
                 )}
               </div>
 
-              <div className="detail-description">
+              <div className="SecretaryTicket-detail-description">
                 <h3>Description</h3>
                 <p>{selectedTicket.description}</p>
               </div>
 
-              <div className="ticket-status-management">
+              <div className="SecretaryTicket-status-management">
                 <h3>Update Status</h3>
-                <div className="status-buttons">
+                <div className="SecretaryTicket-status-buttons">
                   <button 
-                    className={`status-btn ${selectedTicket.status === 'New' ? 'active' : ''}`}
+                    className={`SecretaryTicket-status-btn ${selectedTicket.status === 'New' ? 'SecretaryTicket-active' : ''}`}
                     onClick={() => handleStatusChange('New')}
                   >
                     New
                   </button>
                   <button 
-                    className={`status-btn ${selectedTicket.status === 'Open' ? 'active' : ''}`}
+                    className={`SecretaryTicket-status-btn ${selectedTicket.status === 'Open' ? 'SecretaryTicket-active' : ''}`}
                     onClick={() => handleStatusChange('Open')}
                   >
                     Open
                   </button>
                   <button 
-                    className={`status-btn ${selectedTicket.status === 'In Progress' ? 'active' : ''}`}
+                    className={`SecretaryTicket-status-btn ${selectedTicket.status === 'In Progress' ? 'SecretaryTicket-active' : ''}`}
                     onClick={() => handleStatusChange('In Progress')}
                   >
                     In Progress
                   </button>
                   <button 
-                    className={`status-btn ${selectedTicket.status === 'Resolved' ? 'active' : ''}`}
+                    className={`SecretaryTicket-status-btn ${selectedTicket.status === 'Resolved' ? 'SecretaryTicket-active' : ''}`}
                     onClick={() => handleStatusChange('Resolved')}
                   >
                     Resolved
                   </button>
                   <button 
-                    className={`status-btn ${selectedTicket.status === 'Closed' ? 'active' : ''}`}
+                    className={`SecretaryTicket-status-btn ${selectedTicket.status === 'Closed' ? 'SecretaryTicket-active' : ''}`}
                     onClick={() => handleStatusChange('Closed')}
                   >
                     Closed
@@ -381,46 +381,46 @@ const SecretaryTickets = () => {
               </div>
 
               {selectedTicket.comments && selectedTicket.comments.length > 0 && (
-                <div className="ticket-comments">
+                <div className="SecretaryTicket-comments">
                   <h3>Comments</h3>
-                  <div className="comments-list">
+                  <div className="SecretaryTicket-comments-list">
                     {selectedTicket.comments.map((comment, index) => (
                       <div 
                         key={index} 
-                        className={`comment-item ${comment.isSecretaryComment ? 'secretary-comment' : 'user-comment'}`}
+                        className={`SecretaryTicket-comment-item ${comment.isSecretaryComment ? 'SecretaryTicket-secretary-comment' : 'SecretaryTicket-user-comment'}`}
                       >
-                        <div className="comment-header">
-                          <span className="comment-author">
+                        <div className="SecretaryTicket-comment-header">
+                          <span className="SecretaryTicket-comment-author">
                             {comment.isSecretaryComment ? 'Secretary' : 'User'}
                           </span>
-                          <span className="comment-date">{formatDate(comment.createdAt)}</span>
+                          <span className="SecretaryTicket-comment-date">{formatDate(comment.createdAt)}</span>
                         </div>
-                        <p className="comment-text">{comment.text}</p>
+                        <p className="SecretaryTicket-comment-text">{comment.text}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              <div className="add-comment-section">
+              <div className="SecretaryTicket-add-comment-section">
                 <h3>Add Comment</h3>
-                <form onSubmit={handleCommentSubmit} className="comment-form">
+                <form onSubmit={handleCommentSubmit} className="SecretaryTicket-comment-form">
                   <textarea
                     placeholder="Type your comment here..."
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
-                    className="comment-input"
+                    className="SecretaryTicket-comment-input"
                   />
-                  <button type="submit" className="submit-comment-btn">
+                  <button type="submit" className="SecretaryTicket-submit-comment-btn">
                     Add Comment
                   </button>
                 </form>
               </div>
             </div>
           ) : (
-            <div className="no-ticket-selected">
-              <div className="no-selection-content">
-                <div className="selection-icon">📋</div>
+            <div className="SecretaryTicket-no-ticket-selected">
+              <div className="SecretaryTicket-no-selection-content">
+                <div className="SecretaryTicket-selection-icon">📋</div>
                 <h3>No Ticket Selected</h3>
                 <p>Select a ticket from the list to view details and manage it.</p>
               </div>
