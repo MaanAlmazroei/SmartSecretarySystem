@@ -453,7 +453,7 @@
   .detail-metadata {
     grid-template-columns: 1fr;
   }
-  
+
   .time-slots-container {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -467,7 +467,7 @@
   .form-actions {
     flex-direction: column;
   }
-  
+
   .time-slots-container {
     grid-template-columns: repeat(2, 1fr);
   }

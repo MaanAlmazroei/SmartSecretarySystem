@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import logo from "../../assets/SSS_Logo.png";
 import "./SignUp.css";
 import { signUp } from "../../services/FirebaseAuth";
-import { createUser } from "../../services/FirebaseDB";
+import { createUser } from "../../services/ApiService";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
@@ -94,13 +94,14 @@ const SignUp = () => {
           firstName: formData.firstName,
           lastName: formData.lastName,
           phone: formData.phone,
+          email: formData.email,
+          password: formData.password,
         };
-        const user = await createUser(userCredential.uid, userData);
+        await createUser(userData);
         toast.success("Signed up successfully!");
         setTimeout(() => {
           navigate("/");
         }, 500);
-        return user;
       } catch (error) {
         toast.error("Signup failed!");
       }

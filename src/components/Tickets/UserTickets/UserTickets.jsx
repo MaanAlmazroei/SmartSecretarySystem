@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
-import "./Tickets.css";
-import { getCurrentUser } from "../../../services/FirebaseAuth"; 
-import { getUserAllTickets, createTicket } from "../../../services/FirebaseDB";  
+import "./UserTickets.css";
+import { getCurrentUser } from "../../../services/FirebaseAuth";
+import { getUserAllTickets, createTicket } from "../../../services/ApiService";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../../services/FirebaseConfig"; 
+import { auth } from "../../../services/FirebaseConfig";
 
-const Tickets = () => {
+const UserTickets = () => {
   const initialTicketState = {
     title: "",
     description: "",
     status: "In Progress",
-    submissionDate: "",
-    updateDate: "",
+    createdAt: "",
+    lastUpdatedDate: "",
   };
 
   const [ticket, setTicket] = useState({ ...initialTicketState });
@@ -23,8 +23,11 @@ const Tickets = () => {
   const fetchTickets = async () => {
     if (currentUser?.uid) {
       try {
-        const tickets = await getUserAllTickets(currentUser.uid);
-        setTicketsList(tickets);
+        const response = await getUserAllTickets(currentUser.uid);
+        if (response.error) {
+          throw new Error(response.error);
+        }
+        setTicketsList(response);
       } catch (error) {
         console.error("Error fetching tickets:", error.message);
       }
@@ -82,14 +85,16 @@ const Tickets = () => {
     const now = new Date().toISOString();
 
     try {
-      await createTicket(
-        {
-          ...ticket,
-          submissionDate: now,
-          updateDate: now,
-        },
-        currentUser.uid
-      );
+      const response = await createTicket({
+        ...ticket,
+        createdAt: now,
+        lastUpdatedDate: now,
+        userId: currentUser.uid,
+      });
+
+      if (response.error) {
+        throw new Error(response.error);
+      }
 
       await fetchTickets();
       setTicket({ ...initialTicketState });
@@ -183,9 +188,9 @@ const Tickets = () => {
                     </span>
                   </div>
                   <div className="ticket-dates">
-                    <span>Created: {formatDate(t.submissionDate)}</span>
-                    {t.submissionDate !== t.updateDate && (
-                      <span>Updated: {formatDate(t.updateDate)}</span>
+                    <span>Created: {formatDate(t.createdAt)}</span>
+                    {t.createdAt !== t.lastUpdatedDate && (
+                      <span>Updated: {formatDate(t.lastUpdatedDate)}</span>
                     )}
                   </div>
                   <p className="ticket-description">
@@ -213,12 +218,12 @@ const Tickets = () => {
               <div className="detail-metadata">
                 <div className="metadata-item">
                   <span className="label">Submitted on:</span>
-                  <span>{formatDate(ticket.submissionDate)}</span>
+                  <span>{formatDate(ticket.createdAt)}</span>
                 </div>
-                {ticket.submissionDate !== ticket.updateDate && (
+                {ticket.createdAt !== ticket.lastUpdatedDate && (
                   <div className="metadata-item">
                     <span className="label">Last updated:</span>
-                    <span>{formatDate(ticket.updateDate)}</span>
+                    <span>{formatDate(ticket.lastUpdatedDate)}</span>
                   </div>
                 )}
               </div>
@@ -245,9 +250,10 @@ const Tickets = () => {
                   className={`form-control ${errors.title ? "error" : ""}`}
                 />
                 {errors.title && (
-                  <p className="error-message">{errors.title}</p>
+                  <span className="error-message">{errors.title}</span>
                 )}
               </div>
+
               <div className="form-group">
                 <label htmlFor="description">Description *</label>
                 <textarea
@@ -258,21 +264,16 @@ const Tickets = () => {
                   className={`form-control ${
                     errors.description ? "error" : ""
                   }`}
+                  rows="5"
                 />
                 {errors.description && (
-                  <p className="error-message">{errors.description}</p>
+                  <span className="error-message">{errors.description}</span>
                 )}
               </div>
+
               <div className="form-actions">
                 <button type="submit" className="submit-btn">
-                  Submit
-                </button>
-                <button
-                  type="button"
-                  className="clear-btn"
-                  onClick={handleCancel}
-                >
-                  Clear
+                  Submit Ticket
                 </button>
               </div>
             </form>
@@ -283,4 +284,4 @@ const Tickets = () => {
   );
 };
 
-export default Tickets;
+export default UserTickets;

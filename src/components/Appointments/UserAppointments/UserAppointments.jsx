@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from "react";
-import "./Appointments.css";
+import "./UserAppointments.css";
 import {
   createAppointment,
   getUserAllAppointments,
-} from "../../services/FirebaseDB";
-import { getCurrentUser } from "../../services/FirebaseAuth";
+} from "../../../services/ApiService";
+import { getCurrentUser } from "../../../services/FirebaseAuth";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../services/FirebaseConfig";
+import { auth } from "../../../services/FirebaseConfig";
 
-const Appointments = () => {
+const UserAppointments = () => {
   const initialAppointmentState = {
     title: "",
     appointmentDate: "",
     appointmentTime: "",
     description: "",
+    status: "Scheduled",
+    feedback: "",
+    createdAt: "",
+    lastUpdatedDate: "",
   };
 
   const timeSlots = [
@@ -46,8 +50,11 @@ const Appointments = () => {
   const fetchAppointments = async () => {
     if (currentUser?.uid) {
       try {
-        const appointments = await getUserAllAppointments(currentUser.uid);
-        setAppointmentsList(appointments);
+        const response = await getUserAllAppointments(currentUser.uid);
+        if (response.error) {
+          throw new Error(response.error);
+        }
+        setAppointmentsList(response);
       } catch (error) {
         console.error("Error fetching appointments:", error.message);
       }
@@ -122,20 +129,18 @@ const Appointments = () => {
     }
 
     try {
-      await createAppointment(
-        {
-          title: appointment.title,
-          description: appointment.description,
-          appointmentTime: appointment.appointmentTime,
-          appointmentDate: appointment.appointmentDate,
-          status: "Scheduled",
-          feedback: "",
-          lastUpdatedDate: now,
-          createdAt: now,
-          userId: currentUser.uid,
-        },
-        currentUser.uid
-      );
+      const response = await createAppointment({
+        ...appointment,
+        status: "Scheduled",
+        feedback: "",
+        createdAt: now,
+        lastUpdatedDate: now,
+        userId: currentUser.uid,
+      });
+
+      if (response.error) {
+        throw new Error(response.error);
+      }
 
       await fetchAppointments();
       setAppointment({ ...initialAppointmentState });
@@ -148,12 +153,7 @@ const Appointments = () => {
   const selectAppointment = (id) => {
     const selected = appointmentsList.find((a) => a.id === id);
     if (selected) {
-      setAppointment({
-        title: selected.title,
-        description: selected.description,
-        appointmentTime: selected.appointmentTime,
-        appointmentDate: selected.appointmentDate,
-      });
+      setAppointment(selected);
       setSelectedAppointmentId(id);
     }
   };
@@ -241,10 +241,12 @@ const Appointments = () => {
                   </div>
                   <div className="appointment-dates">
                     <span>Created: {formatDate(a.createdAt)}</span>
+                    {a.createdAt !== a.lastUpdatedDate && (
+                      <span>Updated: {formatDate(a.lastUpdatedDate)}</span>
+                    )}
                   </div>
                   <p className="appointment-description">
-                    {a.description.substring(0, 100)}
-                    {a.description.length > 100 ? "..." : ""}
+                    {a.description.substring(0, 100)}...
                   </p>
                 </div>
               ))}
@@ -258,23 +260,46 @@ const Appointments = () => {
             <div className="appointment-detail">
               <div className="detail-header">
                 <h2>{appointment.title}</h2>
+                <span
+                  className={`appointment-status ${getStatusClass(
+                    appointment.status
+                  )}`}
+                >
+                  {appointment.status}
+                </span>
               </div>
 
               <div className="detail-metadata">
                 <div className="metadata-item">
-                  <span className="label">Date:</span>
-                  <span>{appointment.appointmentDate}</span>
+                  <span className="label">Scheduled for:</span>
+                  <span>
+                    {appointment.appointmentDate} at{" "}
+                    {appointment.appointmentTime}
+                  </span>
                 </div>
                 <div className="metadata-item">
-                  <span className="label">Time:</span>
-                  <span>{appointment.appointmentTime}</span>
+                  <span className="label">Created on:</span>
+                  <span>{formatDate(appointment.createdAt)}</span>
                 </div>
+                {appointment.createdAt !== appointment.lastUpdatedDate && (
+                  <div className="metadata-item">
+                    <span className="label">Last updated:</span>
+                    <span>{formatDate(appointment.lastUpdatedDate)}</span>
+                  </div>
+                )}
               </div>
 
               <div className="detail-description">
                 <h3>Description</h3>
                 <p>{appointment.description}</p>
               </div>
+
+              {appointment.feedback && (
+                <div className="detail-feedback">
+                  <h3>Feedback</h3>
+                  <p>{appointment.feedback}</p>
+                </div>
+              )}
 
               <div className="detail-actions">
                 <button onClick={handleCancel}>Close</button>
@@ -293,7 +318,7 @@ const Appointments = () => {
                   className={`form-control ${errors.title ? "error" : ""}`}
                 />
                 {errors.title && (
-                  <p className="error-message">{errors.title}</p>
+                  <span className="error-message">{errors.title}</span>
                 )}
               </div>
 
@@ -310,7 +335,9 @@ const Appointments = () => {
                   }`}
                 />
                 {errors.appointmentDate && (
-                  <p className="error-message">{errors.appointmentDate}</p>
+                  <span className="error-message">
+                    {errors.appointmentDate}
+                  </span>
                 )}
               </div>
 
@@ -330,7 +357,9 @@ const Appointments = () => {
                   ))}
                 </div>
                 {errors.appointmentTime && (
-                  <p className="error-message">{errors.appointmentTime}</p>
+                  <span className="error-message">
+                    {errors.appointmentTime}
+                  </span>
                 )}
               </div>
 
@@ -344,22 +373,16 @@ const Appointments = () => {
                   className={`form-control ${
                     errors.description ? "error" : ""
                   }`}
+                  rows="5"
                 />
                 {errors.description && (
-                  <p className="error-message">{errors.description}</p>
+                  <span className="error-message">{errors.description}</span>
                 )}
               </div>
 
               <div className="form-actions">
                 <button type="submit" className="submit-btn">
-                  Schedule
-                </button>
-                <button
-                  type="button"
-                  className="clear-btn"
-                  onClick={handleCancel}
-                >
-                  Clear
+                  Schedule Appointment
                 </button>
               </div>
             </form>
@@ -370,4 +393,4 @@ const Appointments = () => {
   );
 };
 
-export default Appointments;
+export default UserAppointments;

@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { getCurrentUser } from "../../services/FirebaseAuth";
+import { getUser, updateUser } from "../../services/ApiService";
 import "./Profile.css";
 
 const Profile = () => {
   const location = useLocation();
   const [editMode, setEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [userData, setUserData] = useState({
-    name: "Name",
-    email: "example@example.com",
-    phone: "123456789",
-    role: "User",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
     password: "",
   });
   const [settings, setSettings] = useState({
@@ -26,6 +30,41 @@ const Profile = () => {
     }
   }, [location]);
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const currentUser = getCurrentUser();
+        if (!currentUser) {
+          throw new Error("No user logged in");
+        }
+
+        // Get email from Firebase Auth
+        const email = currentUser.email;
+
+        // Get other user data from our API
+        const response = await getUser(currentUser.uid);
+        if (response.error) {
+          throw new Error(response.error);
+        }
+
+        setUserData({
+          firstName: response.firstName || "",
+          lastName: response.lastName || "",
+          email: email || "",
+          phone: response.phone || "",
+          password: "",
+        });
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUserData((prev) => ({ ...prev, [name]: value }));
@@ -39,11 +78,39 @@ const Profile = () => {
     }));
   };
 
-  const handleSave = () => {
-    setEditMode(false);
-    console.log("Profile updated:", userData);
-    console.log("Settings updated:", settings);
+  const handleSave = async () => {
+    try {
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
+        throw new Error("No user logged in");
+      }
+
+      const response = await updateUser(currentUser.uid, {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        phone: userData.phone,
+        password: userData.password || undefined,
+      });
+
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
+      setEditMode(false);
+      setUserData((prev) => ({ ...prev, password: "" }));
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      setError(error.message);
+    }
   };
+
+  if (loading) {
+    return <div className="profile-container">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="profile-container">Error: {error}</div>;
+  }
 
   return (
     <div className="profile-container">
@@ -70,8 +137,7 @@ const Profile = () => {
       <div className="profile-content">
         <div className="profile-sidebar">
           <div className="profile-avatar">
-            <h3>{userData.name}</h3>
-            <p>{userData.role}</p>
+            <h3>{`${userData.firstName} ${userData.lastName}`}</h3>
           </div>
 
           <nav className="profile-nav">
@@ -114,8 +180,6 @@ const Profile = () => {
                   onChange={handleSettingsChange}
                 >
                   <option value="English">English</option>
-                  <option value="Spanish">Spanish</option>
-                  <option value="French">French</option>
                 </select>
               </div>
             </div>
@@ -125,12 +189,23 @@ const Profile = () => {
               {editMode ? (
                 <>
                   <div className="form-group">
-                    <label>Full Name</label>
+                    <label>First Name</label>
                     <input
                       type="text"
-                      name="name"
-                      value={userData.name}
+                      name="firstName"
+                      value={userData.firstName}
                       onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Last Name</label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={userData.lastName}
+                      onChange={handleInputChange}
+                      required
                     />
                   </div>
                   <div className="form-group">
@@ -139,7 +214,8 @@ const Profile = () => {
                       type="email"
                       name="email"
                       value={userData.email}
-                      onChange={handleInputChange}
+                      disabled
+                      className="disabled-input"
                     />
                   </div>
                   <div className="form-group">
@@ -149,6 +225,7 @@ const Profile = () => {
                       name="phone"
                       value={userData.phone}
                       onChange={handleInputChange}
+                      required
                     />
                   </div>
                   <div className="form-group">
@@ -165,7 +242,8 @@ const Profile = () => {
               ) : (
                 <>
                   <p>
-                    <strong>Name:</strong> {userData.name}
+                    <strong>Name:</strong>{" "}
+                    {`${userData.firstName} ${userData.lastName}`}
                   </p>
                   <p>
                     <strong>Email:</strong> {userData.email}
