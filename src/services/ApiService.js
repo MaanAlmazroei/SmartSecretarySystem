@@ -222,25 +222,14 @@ export const createResource = async (resourceData) => {
 };
 
 export const getResource = async (resourceId) => {
-  const headers = await getAuthHeader();
-  if (!headers) throw new Error("Not authenticated");
-
   const response = await fetch(
-    `${API_BASE_URL}/get_resource?resourceId=${resourceId}`,
-    {
-      headers,
-    }
+    `${API_BASE_URL}/get_resource?resourceId=${resourceId}`
   );
   return response.json();
 };
 
 export const getAllResources = async () => {
-  const headers = await getAuthHeader();
-  if (!headers) throw new Error("Not authenticated");
-
-  const response = await fetch(`${API_BASE_URL}/get_all_resources`, {
-    headers,
-  });
+  const response = await fetch(`${API_BASE_URL}/get_all_resources`);
   return response.json();
 };
 

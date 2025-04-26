@@ -519,7 +519,6 @@ def create_resource():
 
 
 @app.route('/get_resource', methods=['GET'])
-@require_auth
 def get_resource():
     resource_id = request.args.get('resourceId')
     if not resource_id:
@@ -532,7 +531,6 @@ def get_resource():
 
 
 @app.route('/get_all_resources', methods=['GET'])
-@require_auth
 def get_all_resources():
     resources = db.collection('resources').stream()
     result = []

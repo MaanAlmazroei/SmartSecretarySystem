@@ -9,7 +9,8 @@ import Home from "./components/Home/Home";
 import Layout from "./components/Layout/Layout";
 import SignUp from "./components/SignUp/SignUp";
 import Login from "./components/Login/Login";
-import Resources from "./components/SelfServicePortal/Resources";
+import NoSecResources from "./components/Resources/NoSecResources/NoSecResources.jsx";
+import SecResources from "./components/Resources/SecResources/SecResources.jsx";
 import Profile from "./components/Profile/Profile";
 import UserTickets from "./components/Tickets/UserTickets/UserTickets.jsx";
 import SecretaryTickets from "./components/Tickets/SecretaryTickets/SecretaryTickets.jsx";
@@ -46,13 +47,20 @@ const RoleBasedRoute = ({ children, roles }) => {
 };
 
 function AppRoutes() {
+  const { userRole } = useUser();
+
   return (
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/resources" element={<Resources />} />
+      <Route
+        path="/resources"
+        element={
+          userRole === "secretary" ? <SecResources /> : <NoSecResources />
+        }
+      />
 
       {/* Protected Routes */}
       <Route
