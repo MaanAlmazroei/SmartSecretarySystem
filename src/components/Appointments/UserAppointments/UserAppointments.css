@@ -177,16 +177,16 @@
   color: #ffffff;
 }
 
-.status-scheduled {
+.appointment-status-rejected {
+  background-color: #252525;
+}
+
+.appointment-status-approved {
+  background-color: #3a3a3a;
+}
+
+.appointment-status-in-progress {
   background-color: #555555;
-}
-
-.status-completed {
-  background-color: #888888;
-}
-
-.status-cancelled {
-  background-color: #aaaaaa;
 }
 
 .appointment-dates {

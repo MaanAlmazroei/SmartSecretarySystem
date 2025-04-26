@@ -177,24 +177,12 @@
   color: #ffffff;
 }
 
-.status-new {
+.ticket-status-resolved {
   background-color: #3a3a3a;
 }
 
-.status-open {
+.ticket-status-in-progress {
   background-color: #555555;
-}
-
-.status-in-progress {
-  background-color: #666666;
-}
-
-.status-resolved {
-  background-color: #888888;
-}
-
-.status-closed {
-  background-color: #aaaaaa;
 }
 
 .ticket-dates {
@@ -476,4 +464,24 @@
   .form-actions {
     flex-direction: column;
   }
+}
+
+.detail-feedback {
+  margin-bottom: 1.5rem;
+}
+
+.detail-feedback h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #404040;
+  margin-bottom: 0.5rem;
+}
+
+.detail-feedback p {
+  background-color: #f8f8f8;
+  border: 1px solid #404040;
+  padding: 1rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  line-height: 1.6;
 }

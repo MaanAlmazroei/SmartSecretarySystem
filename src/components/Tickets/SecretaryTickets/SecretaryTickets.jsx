@@ -1,60 +1,68 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./SecretaryTickets.css";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../../services/FirebaseConfig";
 import {
   getAllTickets,
   updateTicket,
-  getTicket,
+  getUser,
 } from "../../../services/ApiService";
-import { getCurrentUser } from "../../../services/FirebaseAuth";
 
 const SecretaryTickets = () => {
   const [ticketsList, setTicketsList] = useState([]);
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [selectedTicketId, setSelectedTicketId] = useState(null);
   const [selectedTicket, setSelectedTicket] = useState(null);
-  const [secretaryId, setSecretaryId] = useState(null);
   const [statusFilter, setStatusFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
-  const [newComment, setNewComment] = useState("");
+  const [newFeedback, setNewFeedback] = useState("");
   const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState(getCurrentUser());
 
-  // Fetch all tickets
-  const fetchAllTickets = async () => {
+  // Add function to fetch user details
+  const fetchUserDetails = useCallback(async (userId) => {
+    try {
+      const response = await getUser(userId);
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      return response;
+    } catch (error) {
+      console.error("Error fetching user details:", error.message);
+      return null;
+    }
+  }, []);
+
+  // Modify fetchAllTickets to include user details
+  const fetchAllTickets = useCallback(async () => {
     try {
       setLoading(true);
       const response = await getAllTickets();
       if (response.error) {
         throw new Error(response.error);
       }
-      setTicketsList(response);
-      applyFilters(response, statusFilter, searchTerm);
+
+      // Fetch user details for each ticket
+      const ticketsWithUserDetails = await Promise.all(
+        response.map(async (ticket) => {
+          const userInfo = await fetchUserDetails(ticket.userId);
+          return {
+            ...ticket,
+            userFirstName: userInfo?.firstName || "Unknown",
+            userLastName: userInfo?.lastName || "User",
+          };
+        })
+      );
+
+      setTicketsList(ticketsWithUserDetails);
+      applyFilters(ticketsWithUserDetails, statusFilter, searchTerm);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching tickets:", error.message);
       setLoading(false);
     }
-  };
+  }, [statusFilter, searchTerm, fetchUserDetails]);
 
   useEffect(() => {
     fetchAllTickets();
-  }, []);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setSecretaryId(user.uid);
-        setCurrentUser(user);
-      } else {
-        setSecretaryId(null);
-        setCurrentUser(null);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
+  }, [fetchAllTickets]);
 
   // Apply filters to tickets
   const applyFilters = (tickets, status, term) => {
@@ -72,7 +80,9 @@ const SecretaryTickets = () => {
         (ticket) =>
           ticket.title.toLowerCase().includes(searchLower) ||
           ticket.description.toLowerCase().includes(searchLower) ||
-          (ticket.userId && ticket.userId.toLowerCase().includes(searchLower))
+          `${ticket.userFirstName} ${ticket.userLastName}`
+            .toLowerCase()
+            .includes(searchLower)
       );
     }
 
@@ -96,7 +106,7 @@ const SecretaryTickets = () => {
     if (selected) {
       setSelectedTicket(selected);
       setSelectedTicketId(id);
-      setNewComment("");
+      setNewFeedback(selected.feedback || "");
     }
   };
 
@@ -112,22 +122,12 @@ const SecretaryTickets = () => {
     }
   };
 
-  const handleCommentSubmit = async (ticketId) => {
-    if (!newComment.trim()) return;
+  const handleFeedbackSubmit = async (ticketId) => {
+    if (!newFeedback.trim()) return;
 
     try {
-      const ticket = ticketsList.find((t) => t.id === ticketId);
-      const updatedComments = [
-        ...(ticket.comments || []),
-        {
-          text: newComment,
-          userId: currentUser.uid,
-          createdAt: new Date().toISOString(),
-        },
-      ];
-
       const response = await updateTicket(ticketId, {
-        comments: updatedComments,
+        feedback: newFeedback,
         lastUpdatedDate: new Date().toISOString(),
       });
 
@@ -135,10 +135,10 @@ const SecretaryTickets = () => {
         throw new Error(response.error);
       }
 
-      setNewComment("");
+      setNewFeedback("");
       await fetchAllTickets();
     } catch (error) {
-      console.error("Error adding comment:", error.message);
+      console.error("Error adding feedback:", error.message);
     }
   };
 
@@ -163,15 +163,9 @@ const SecretaryTickets = () => {
   const getStatusClass = (status) => {
     switch (status) {
       case "In Progress":
-        return "SecretaryTicket-status-in-progress";
-      case "Closed":
-        return "SecretaryTicket-status-closed";
+        return "ticket-status-in-progress";
       case "Resolved":
-        return "SecretaryTicket-status-resolved";
-      case "Open":
-        return "SecretaryTicket-status-open";
-      case "New":
-        return "SecretaryTicket-status-new";
+        return "ticket-status-resolved";
       default:
         return "";
     }
@@ -209,11 +203,8 @@ const SecretaryTickets = () => {
             className="SecretaryTicket-filter-select"
           >
             <option value="All">All Statuses</option>
-            <option value="New">New</option>
-            <option value="Open">Open</option>
             <option value="In Progress">In Progress</option>
             <option value="Resolved">Resolved</option>
-            <option value="Closed">Closed</option>
           </select>
         </div>
 
@@ -222,7 +213,7 @@ const SecretaryTickets = () => {
           <input
             type="text"
             id="ticketSearch"
-            placeholder="Search by title, description or user ID"
+            placeholder="Search by title, description or user name"
             value={searchTerm}
             onChange={handleSearchChange}
             className="SecretaryTicket-search-input"
@@ -292,10 +283,7 @@ const SecretaryTickets = () => {
                   </p>
                   <div className="SecretaryTicket-ticket-user-info">
                     <span>
-                      User ID:{" "}
-                      {ticket.userId
-                        ? ticket.userId.substring(0, 8) + "..."
-                        : "Unknown"}
+                      User: {ticket.userFirstName} {ticket.userLastName}
                     </span>
                   </div>
                 </div>
@@ -330,7 +318,9 @@ const SecretaryTickets = () => {
               <div className="SecretaryTicket-detail-metadata">
                 <div className="SecretaryTicket-metadata-item">
                   <span className="SecretaryTicket-label">Submitted by:</span>
-                  <span>{selectedTicket.userId || "Unknown"}</span>
+                  <span>
+                    {selectedTicket.userFirstName} {selectedTicket.userLastName}
+                  </span>
                 </div>
                 <div className="SecretaryTicket-metadata-item">
                   <span className="SecretaryTicket-label">Submitted on:</span>
@@ -367,28 +357,6 @@ const SecretaryTickets = () => {
                 <div className="SecretaryTicket-status-buttons">
                   <button
                     className={`SecretaryTicket-status-btn ${
-                      selectedTicket.status === "New"
-                        ? "SecretaryTicket-active"
-                        : ""
-                    }`}
-                    onClick={() => handleStatusChange(selectedTicket.id, "New")}
-                  >
-                    New
-                  </button>
-                  <button
-                    className={`SecretaryTicket-status-btn ${
-                      selectedTicket.status === "Open"
-                        ? "SecretaryTicket-active"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      handleStatusChange(selectedTicket.id, "Open")
-                    }
-                  >
-                    Open
-                  </button>
-                  <button
-                    className={`SecretaryTicket-status-btn ${
                       selectedTicket.status === "In Progress"
                         ? "SecretaryTicket-active"
                         : ""
@@ -411,74 +379,29 @@ const SecretaryTickets = () => {
                   >
                     Resolved
                   </button>
-                  <button
-                    className={`SecretaryTicket-status-btn ${
-                      selectedTicket.status === "Closed"
-                        ? "SecretaryTicket-active"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      handleStatusChange(selectedTicket.id, "Closed")
-                    }
-                  >
-                    Closed
-                  </button>
                 </div>
               </div>
 
-              {selectedTicket.comments &&
-                selectedTicket.comments.length > 0 && (
-                  <div className="SecretaryTicket-comments">
-                    <h3>Comments</h3>
-                    <div className="SecretaryTicket-comments-list">
-                      {selectedTicket.comments.map((comment, index) => (
-                        <div
-                          key={index}
-                          className={`SecretaryTicket-comment-item ${
-                            comment.isSecretaryComment
-                              ? "SecretaryTicket-secretary-comment"
-                              : "SecretaryTicket-user-comment"
-                          }`}
-                        >
-                          <div className="SecretaryTicket-comment-header">
-                            <span className="SecretaryTicket-comment-author">
-                              {comment.isSecretaryComment
-                                ? "Secretary"
-                                : "User"}
-                            </span>
-                            <span className="SecretaryTicket-comment-date">
-                              {formatDate(comment.createdAt)}
-                            </span>
-                          </div>
-                          <p className="SecretaryTicket-comment-text">
-                            {comment.text}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
               <div className="SecretaryTicket-add-comment-section">
-                <h3>Add Comment</h3>
+                <h3>Add Feedback</h3>
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    handleCommentSubmit(selectedTicket.id);
+                    handleFeedbackSubmit(selectedTicket.id);
                   }}
                   className="SecretaryTicket-comment-form"
                 >
                   <textarea
-                    placeholder="Type your comment here..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Type your feedback here..."
+                    value={newFeedback}
+                    onChange={(e) => setNewFeedback(e.target.value)}
                     className="SecretaryTicket-comment-input"
                   />
                   <button
                     type="submit"
                     className="SecretaryTicket-submit-comment-btn"
                   >
-                    Add Comment
+                    Add Feedback
                   </button>
                 </form>
               </div>

@@ -14,7 +14,7 @@ const UserAppointments = () => {
     appointmentDate: "",
     appointmentTime: "",
     description: "",
-    status: "Scheduled",
+    status: "In Progress",
     feedback: "",
     createdAt: "",
     lastUpdatedDate: "",
@@ -131,8 +131,6 @@ const UserAppointments = () => {
     try {
       const response = await createAppointment({
         ...appointment,
-        status: "Scheduled",
-        feedback: "",
         createdAt: now,
         lastUpdatedDate: now,
         userId: currentUser.uid,
@@ -179,12 +177,12 @@ const UserAppointments = () => {
 
   const getStatusClass = (status) => {
     switch (status) {
-      case "Scheduled":
-        return "status-scheduled";
-      case "Completed":
-        return "status-completed";
-      case "Cancelled":
-        return "status-cancelled";
+      case "In Progress":
+        return "appointment-status-in-progress";
+      case "Approved":
+        return "appointment-status-approved";
+      case "Rejected":
+        return "appointment-status-rejected";
       default:
         return "";
     }

@@ -10,6 +10,7 @@ const UserTickets = () => {
     title: "",
     description: "",
     status: "In Progress",
+    feedback: "",
     createdAt: "",
     lastUpdatedDate: "",
   };
@@ -134,9 +135,9 @@ const UserTickets = () => {
   const getStatusClass = (status) => {
     switch (status) {
       case "In Progress":
-        return "status-in-progress";
-      case "Closed":
-        return "status-closed";
+        return "ticket-status-in-progress";
+      case "Resolved":
+        return "ticket-status-resolved";
       default:
         return "";
     }
@@ -231,6 +232,11 @@ const UserTickets = () => {
               <div className="detail-description">
                 <h3>Description</h3>
                 <p>{ticket.description}</p>
+              </div>
+
+              <div className="detail-feedback">
+                <h3>Feedback</h3>
+                <p>{ticket.feedback || "No feedback provided yet"}</p>
               </div>
 
               <div className="detail-actions">

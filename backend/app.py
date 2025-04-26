@@ -197,6 +197,8 @@ def create_ticket():
     ticket_data = {
         'title': data['title'],
         'description': data['description'],
+        'status': 'In Progress',  # Default status for tickets
+        'feedback': '',  # Default empty feedback
         'userId': request.user['uid'],
         'createdAt': firestore.SERVER_TIMESTAMP,
         'lastUpdatedDate': firestore.SERVER_TIMESTAMP,
@@ -269,7 +271,7 @@ def get_user_tickets():
 
 
 @app.route('/update_ticket', methods=['PUT'])
-@require_auth
+@require_secretary_role
 def update_ticket():
     data = request.get_json()
     
@@ -283,18 +285,14 @@ def update_ticket():
     if not ticket_doc.exists:
         return jsonify({'error': 'Ticket not found'}), 404
     
-    ticket_data = ticket_doc.to_dict()
-    current_user_id = request.user['uid']
-    
-    # Check if the user is the owner of the ticket or a secretary
-    user_doc = db.collection('users').document(current_user_id).get()
-    user_role = user_doc.to_dict().get('role') if user_doc.exists else 'user'
-    
-    if ticket_data['userId'] != current_user_id and user_role != 'secretary':
-        return jsonify({'error': 'Unauthorized to update this ticket'}), 403
+    # Validate status if it's being updated
+    if 'status' in data:
+        valid_statuses = ['In Progress', 'Resolved']
+        if data['status'] not in valid_statuses:
+            return jsonify({'error': f'Invalid status. Status must be one of: {", ".join(valid_statuses)}'}), 400
     
     # Validate and filter allowed fields
-    allowed_fields = ['title', 'description']
+    allowed_fields = ['title', 'description', 'status', 'feedback']
     updated_data = {}
     for field in allowed_fields:
         if field in data:
@@ -355,6 +353,8 @@ def create_appointment():
         'description': data['description'],
         'appointmentDate': data['appointmentDate'],
         'appointmentTime': data['appointmentTime'],
+        'status': 'In Progress',  # Default status for appointments
+        'feedback': '',  # Default empty feedback
         'userId': request.user['uid'],
         'createdAt': firestore.SERVER_TIMESTAMP,
         'lastUpdatedDate': firestore.SERVER_TIMESTAMP,
@@ -427,7 +427,7 @@ def get_user_appointments():
 
 
 @app.route('/update_appointment', methods=['PUT'])
-@require_auth
+@require_secretary_role
 def update_appointment():
     data = request.get_json()
     
@@ -441,18 +441,14 @@ def update_appointment():
     if not appointment_doc.exists:
         return jsonify({'error': 'Appointment not found'}), 404
     
-    appointment_data = appointment_doc.to_dict()
-    current_user_id = request.user['uid']
-    
-    # Check if the user is the owner of the appointment or a secretary
-    user_doc = db.collection('users').document(current_user_id).get()
-    user_role = user_doc.to_dict().get('role') if user_doc.exists else 'user'
-    
-    if appointment_data['userId'] != current_user_id and user_role != 'secretary':
-        return jsonify({'error': 'Unauthorized to update this appointment'}), 403
+    # Validate status if it's being updated
+    if 'status' in data:
+        valid_statuses = ['In Progress', 'Approved', 'Rejected']
+        if data['status'] not in valid_statuses:
+            return jsonify({'error': f'Invalid status. Status must be one of: {", ".join(valid_statuses)}'}), 400
     
     # Validate and filter allowed fields
-    allowed_fields = ['title', 'description', 'appointmentDate', 'appointmentTime']
+    allowed_fields = ['title', 'description', 'appointmentDate', 'appointmentTime', 'status', 'feedback']
     updated_data = {}
     for field in allowed_fields:
         if field in data:
