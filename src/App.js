@@ -15,7 +15,6 @@ import UserTickets from "./components/Tickets/UserTickets/UserTickets.jsx";
 import SecretaryTickets from "./components/Tickets/SecretaryTickets/SecretaryTickets.jsx";
 import UserAppointments from "./components/Appointments/UserAppointments/UserAppointments.jsx";
 import SecretaryAppointments from "./components/Appointments/SecretaryAppointments/SecretaryAppointments.jsx";
-import Chatbot from "./components/Chatbot/Chatbot.jsx";
 import { useUser } from "./Context/UserContext";
 
 const ProtectedRoute = ({ children, requiredRole }) => {
@@ -54,7 +53,6 @@ function AppRoutes() {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/login" element={<Login />} />
       <Route path="/resources" element={<Resources />} />
-      <Route path="/Chatbot" element={<Chatbot />} />
 
       {/* Protected Routes */}
       <Route

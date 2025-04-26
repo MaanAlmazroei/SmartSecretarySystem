@@ -89,7 +89,7 @@ const SignUp = () => {
 
     if (validateForm()) {
       try {
-        const userCredential = await signUp(formData.email, formData.password);
+        await signUp(formData.email, formData.password);
         const userData = {
           firstName: formData.firstName,
           lastName: formData.lastName,
