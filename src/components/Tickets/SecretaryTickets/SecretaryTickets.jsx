@@ -16,7 +16,6 @@ const SecretaryTickets = () => {
   const [newFeedback, setNewFeedback] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Add function to fetch user details
   const fetchUserDetails = useCallback(async (userId) => {
     try {
       const response = await getUser(userId);
@@ -30,7 +29,6 @@ const SecretaryTickets = () => {
     }
   }, []);
 
-  // Modify fetchAllTickets to include user details
   const fetchAllTickets = useCallback(async () => {
     try {
       setLoading(true);
@@ -39,7 +37,6 @@ const SecretaryTickets = () => {
         throw new Error(response.error);
       }
 
-      // Fetch user details for each ticket
       const ticketsWithUserDetails = await Promise.all(
         response.map(async (ticket) => {
           const userInfo = await fetchUserDetails(ticket.userId);
@@ -64,16 +61,13 @@ const SecretaryTickets = () => {
     fetchAllTickets();
   }, [fetchAllTickets]);
 
-  // Apply filters to tickets
   const applyFilters = (tickets, status, term) => {
     let filtered = [...tickets];
 
-    // Apply status filter
     if (status !== "All") {
       filtered = filtered.filter((ticket) => ticket.status === status);
     }
 
-    // Apply search filter
     if (term) {
       const searchLower = term.toLowerCase();
       filtered = filtered.filter(
@@ -116,6 +110,15 @@ const SecretaryTickets = () => {
       if (response.error) {
         throw new Error(response.error);
       }
+      
+      if (selectedTicket && selectedTicket.id === ticketId) {
+        setSelectedTicket({
+          ...selectedTicket,
+          status: newStatus,
+          lastUpdatedDate: new Date().toISOString()
+        });
+      }
+      
       await fetchAllTickets();
     } catch (error) {
       console.error("Error updating ticket status:", error.message);
@@ -194,35 +197,38 @@ const SecretaryTickets = () => {
       </header>
 
       <div className="SecretaryTicket-filters">
-        <div className="SecretaryTicket-filter-group">
-          <label htmlFor="statusFilter">Filter by Status:</label>
-          <select
-            id="statusFilter"
-            value={statusFilter}
-            onChange={handleStatusFilterChange}
-            className="SecretaryTicket-filter-select"
-          >
-            <option value="All">All Statuses</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Resolved">Resolved</option>
-          </select>
+        <div className="SecretaryTicket-filter-left">
+          <div className="SecretaryTicket-filter-group">
+            <label htmlFor="statusFilter">Filter by Status:</label>
+            <select
+              id="statusFilter"
+              value={statusFilter}
+              onChange={handleStatusFilterChange}
+              className="SecretaryTicket-filter-select"
+            >
+              <option value="All">All Statuses</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+          </div>
         </div>
 
-        <div className="SecretaryTicket-filter-group SecretaryTicket-search-group">
-          <label htmlFor="ticketSearch">Search Tickets:</label>
-          <input
-            type="text"
-            id="ticketSearch"
-            placeholder="Search by title, description or user name"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="SecretaryTicket-search-input"
-          />
+        <div className="SecretaryTicket-filter-right">
+          <div className="SecretaryTicket-filter-group SecretaryTicket-search-group">
+            <label htmlFor="ticketSearch">Search Tickets:</label>
+            <input
+              type="text"
+              id="ticketSearch"
+              placeholder="Search by title, description or name"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="SecretaryTicket-search-input"
+            />
+          </div>
         </div>
       </div>
 
       <div className="SecretaryTicket-main">
-        {/* Left Panel: Tickets List */}
         <section className="SecretaryTicket-list-section">
           <div className="SecretaryTicket-section-header">
             <h2>All Tickets</h2>
@@ -292,7 +298,6 @@ const SecretaryTickets = () => {
           )}
         </section>
 
-        {/* Right Panel: Ticket Detail View */}
         <section className="SecretaryTicket-detail-section">
           {selectedTicketId && selectedTicket ? (
             <div className="SecretaryTicket-detail">

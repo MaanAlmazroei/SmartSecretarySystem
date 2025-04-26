@@ -104,7 +104,7 @@ const Chatbot = () => {
                 className="Chatbot-close-button material-symbols-rounded"
                 onClick={toggleMinimize}
               >
-                Drop
+                Hide
               </button>
             </div>
 
