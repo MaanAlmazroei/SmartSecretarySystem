@@ -69,14 +69,13 @@
   margin-right: 0.25rem;
 }
 
+/* Update appointments-list-section to match the secretary version */
 .appointments-list-section {
   background-color: #ffffff;
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  width: 400px;
-  height: 600px;
-  overflow: auto;
+  height: 600px; /* Set fixed height instead of width */
 }
 
 .no-appointments {
@@ -87,25 +86,28 @@
   border-radius: 6px;
 }
 
+/* Fix the appointments-list styling to match the secretary version */
 .appointments-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-height: 70vh;
+  max-height: 90%; /* Match secretary ratio */
+  overflow-y: auto;
+  overflow-x: hidden;
   padding-right: 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: #c0c0c0 #f8f8f8;
 }
 
 .appointment-item {
+  padding: 0.75rem;
   background-color: #f8f8f8;
   border-radius: 6px;
-  padding: 1rem;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease,
-    background-color 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
   position: relative;
-  overflow: hidden;
-  min-height: 6rem;
-  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+  overflow: visible;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .appointment-item:hover {
@@ -193,17 +195,17 @@
   overflow: hidden;
 }
 
-.appointment-detail-section {
+/* Fix user-appointment-detail-section to use height instead of width */
+.user-appointment-detail-section {
   background-color: #ffffff;
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  width: 800px;
-  height: 600px;
+  height: 600px; /* Use height instead of width */
   overflow: auto;
 }
 
-.detail-header {
+.user-appointment-detail-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -212,7 +214,7 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
-.detail-header h2 {
+.user-appointment-detail-header h2 {
   font-size: 1.5rem;
   font-weight: 600;
   color: #000000;
@@ -423,6 +425,23 @@
   background-color: #e0e0e0;
 }
 
+
+/* Add scrollbar styling that matches the secretary version */
+.appointments-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.appointments-list::-webkit-scrollbar-track {
+  background: #f8f8f8;
+}
+
+.appointments-list::-webkit-scrollbar-thumb {
+  background-color: #c0c0c0;
+  border-radius: 6px;
+}
+
+
+
 @media (max-width: 992px) {
   .appointments-main {
     grid-template-columns: 1fr;
@@ -430,16 +449,9 @@
   }
 
   .appointments-list-section,
-  .appointment-detail-section {
-    width: 100%;
-  }
-
-  .detail-metadata {
-    grid-template-columns: 1fr;
-  }
-
-  .time-slots-container {
-    grid-template-columns: repeat(2, 1fr);
+  .user-appointment-detail-section {
+    height: auto; /* Let height adjust on smaller screens */
+    max-height: 600px;
   }
 }
 

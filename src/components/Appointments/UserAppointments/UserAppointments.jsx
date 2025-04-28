@@ -255,10 +255,10 @@ const UserAppointments = () => {
         </section>
 
         {/* Right Panel: Appointment Detail View */}
-        <section className="appointment-detail-section">
+        <section className="user-appointment-detail-section">
           {selectedAppointmentId ? (
             <div className="appointment-detail">
-              <div className="detail-header">
+              <div className="user-appointment-detail-header">
                 <h2>{appointment.title}</h2>
                 <span
                   className={`appointment-status ${getStatusClass(
