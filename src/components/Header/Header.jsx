@@ -1,29 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import logo from "../../assets/SSS_Logo.png";
 import "./Header.css";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../services/FirebaseConfig";
-import { logOut } from "../../services/FirebaseAuth";
+import { useAuth } from "../../Context/AuthContext";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsLoggedIn(!!user);
-    });
-
-    return () => unsubscribe();
-  }, []);
 
   const handleLogout = async (e) => {
     e.preventDefault();
     try {
-      await logOut();
+      await logout();
       toast.success("Signed out successfully!");
       setTimeout(() => {
         navigate("/");
@@ -97,8 +87,8 @@ const Header = () => {
         </div>
       </nav>
       <div className="signup-container">
-        {isLoggedIn ? (
-          <NavLink to="/" className="signup" onClick={handleLogout}>
+        {user ? (
+          <NavLink to="/" className="logout-btn" onClick={handleLogout}>
             Sign Out
           </NavLink>
         ) : (

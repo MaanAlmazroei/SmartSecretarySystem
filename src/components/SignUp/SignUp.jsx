@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import logo from "../../assets/SSS_Logo.png";
 import "./SignUp.css";
-import { signUp } from "../../services/FirebaseAuth";
 import { createUser } from "../../services/ApiService";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import { useAuth } from "../../Context/AuthContext";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { login: authLogin } = useAuth();
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -49,7 +50,7 @@ const SignUp = () => {
       missingRequirements.push("number");
     }
     if (password.length < 8) {
-      missingRequirements.push("minimum 8 characters");
+      missingRequirements.push("at least 8 characters");
     }
 
     return missingRequirements;
@@ -57,30 +58,26 @@ const SignUp = () => {
 
   const validateForm = () => {
     const passwordErrors = validatePassword(formData.password);
-
     const newErrors = {
       firstName: formData.firstName ? "" : "First name is required",
       lastName: formData.lastName ? "" : "Last name is required",
       email: formData.email ? "" : "Email is required",
       phone: formData.phone ? "" : "Phone number is required",
-      password:
-        passwordErrors.length === 0
-          ? ""
-          : "Password does not meet requirements",
+      password: passwordErrors,
       confirmPassword:
-        formData.confirmPassword === formData.password
+        formData.password === formData.confirmPassword
           ? ""
-          : "Passwords must match",
+          : "Passwords do not match",
       submitted: true,
     };
 
-    setErrors({
-      ...newErrors,
-      passwordDetails: passwordErrors,
-    });
+    setErrors(newErrors);
 
     return Object.values(newErrors).every(
-      (error) => error === "" || error === true
+      (error) =>
+        (Array.isArray(error) && error.length === 0) ||
+        error === "" ||
+        error === true
     );
   };
 
@@ -89,21 +86,20 @@ const SignUp = () => {
 
     if (validateForm()) {
       try {
-        await signUp(formData.email, formData.password);
-        const userData = {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          phone: formData.phone,
-          email: formData.email,
-          password: formData.password,
-        };
-        await createUser(userData);
-        toast.success("Signed up successfully!");
-        setTimeout(() => {
-          navigate("/");
-        }, 500);
+        const { confirmPassword, ...signupData } = formData;
+        const response = await createUser(signupData);
+
+        if (response.error) {
+          throw new Error(response.error);
+        }
+
+        // Automatically log in the user after successful signup
+        await authLogin(formData.email, formData.password);
+
+        toast.success("Account created successfully!");
+        navigate("/");
       } catch (error) {
-        toast.error("Signup failed!");
+        toast.error(error.message || "Failed to create account");
       }
     }
   };

@@ -16,10 +16,10 @@ import UserTickets from "./components/Tickets/UserTickets/UserTickets.jsx";
 import SecretaryTickets from "./components/Tickets/SecretaryTickets/SecretaryTickets.jsx";
 import UserAppointments from "./components/Appointments/UserAppointments/UserAppointments.jsx";
 import SecretaryAppointments from "./components/Appointments/SecretaryAppointments/SecretaryAppointments.jsx";
-import { useUser } from "./Context/UserContext";
+import { useAuth } from "./Context/AuthContext";
 
 const ProtectedRoute = ({ children, requiredRole }) => {
-  const { user, userRole, loading } = useUser();
+  const { user, loading } = useAuth();
 
   if (loading) {
     return <div>Loading...</div>;
@@ -29,7 +29,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     return <Navigate to="/login" />;
   }
 
-  if (requiredRole && userRole !== requiredRole) {
+  if (requiredRole && user.role !== requiredRole) {
     return <Navigate to="/" />;
   }
 
@@ -37,17 +37,17 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 };
 
 const RoleBasedRoute = ({ children, roles }) => {
-  const { userRole } = useUser();
+  const { user } = useAuth();
 
-  if (!roles.includes(userRole)) {
+  if (!roles.includes(user.role)) {
     return <Navigate to="/" />;
   }
 
-  return userRole === "secretary" ? children.secretary : children.user;
+  return user.role === "secretary" ? children.secretary : children.user;
 };
 
 function AppRoutes() {
-  const { userRole } = useUser();
+  const { user } = useAuth();
 
   return (
     <Routes>
@@ -58,7 +58,7 @@ function AppRoutes() {
       <Route
         path="/resources"
         element={
-          userRole === "secretary" ? <SecResources /> : <NoSecResources />
+          user?.role === "secretary" ? <SecResources /> : <NoSecResources />
         }
       />
 
