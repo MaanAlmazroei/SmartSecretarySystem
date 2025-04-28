@@ -76,7 +76,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   width: 400px;
   height: 600px;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .no-tickets {
@@ -91,11 +91,12 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-height: 70vh;
+  max-height: 90%;
   overflow-y: auto;
   padding-right: 0.5rem;
   scrollbar-width: thin;
   scrollbar-color: #c0c0c0 #f8f8f8;
+  overflow-x: hidden;
 }
 
 .tickets-list::-webkit-scrollbar {
@@ -119,8 +120,9 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease,
     background-color 0.2s ease;
   position: relative;
-  overflow: hidden;
-  min-height: 6rem;
+  overflow: visible;
+  margin-bottom: 3px;
+  margin-top: 3px;
   box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
 }
 

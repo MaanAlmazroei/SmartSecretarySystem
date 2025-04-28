@@ -8,9 +8,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid #e1e1e1;
-  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0;
 }
 
 .profile-header h1 {
@@ -63,7 +62,7 @@
 .profile-content {
   display: flex;
   gap: 2rem;
-  align-items: flex-start; /* Changed from stretch to prevent natural expansion */
+  align-items: flex-start;
 }
 
 .profile-sidebar {
@@ -72,7 +71,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   border-radius: 8px;
   padding: 1rem;
-  height: 260px; /* Fixed height to match content sections */
 }
 
 .profile-details {
@@ -82,20 +80,20 @@
   gap: 1.5rem;
 }
 
-/* Fixed size containers */
 .detail-section, 
-.settings-section {
+.settings-section,
+.overview-section {
   width: 100%;
-  height: 260px; /* Fixed matching height */
   background: white;
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  overflow-y: auto; /* Scroll if content overflows */
+  /* Removed fixed height and overflow */
 }
 
 .detail-section h2, 
-.settings-section h2 {
+.settings-section h2,
+.overview-section h2 {
   color: black;
   margin-top: 0;
   margin-bottom: 1.5rem;
@@ -216,6 +214,47 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* Overview section styles */
+.edit-button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.edit-button:hover {
+  background-color: #000;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.save-button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.save-button:hover {
+  background-color: #000;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .profile-content {
@@ -224,13 +263,7 @@
 
   .profile-sidebar {
     flex: 0 0 auto;
-    height: auto; /* Auto height on mobile */
     width: 100%;
-  }
-
-  .detail-section,
-  .settings-section {
-    height: 500px; /* Slightly smaller on mobile */
   }
 
   .setting-item select {
