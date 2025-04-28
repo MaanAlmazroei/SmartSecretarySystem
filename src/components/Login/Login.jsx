@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import logo from "../../assets/SSS_Logo.png";
 import "./Login.css";
-import { login } from "../../services/ApiService";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../Context/AuthContext";
@@ -48,7 +47,7 @@ function Login() {
 
     if (validateForm()) {
       try {
-        const response = await authLogin(formData.email, formData.password);
+        authLogin(formData.email, formData.password);
         toast.success("Logged in successfully!");
         navigate("/");
       } catch (error) {

@@ -5,6 +5,9 @@ import functools
 from flask_cors import CORS
 import secrets
 from datetime import timedelta
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)  # Generate a secure secret key
@@ -60,6 +63,88 @@ def require_secretary_role(f):
         return f(*args, **kwargs)
     return decorated_function
 
+@app.route('/login', methods=['POST', 'OPTIONS'])
+def login():
+    if request.method == 'OPTIONS':
+        return '', 200
+        
+    data = request.get_json()
+    
+    if 'email' not in data or 'password' not in data:
+        return jsonify({'error': 'Email and password are required'}), 400
+    
+    try:
+        # Verify user credentials with Firebase
+        user = auth.get_user_by_email(data['email'])
+        
+        # Set session data
+        session.permanent = True
+        session['user_id'] = user.uid
+        session['email'] = data['email']
+        
+        # Get user role from Firestore
+        user_doc = db.collection('users').document(user.uid).get()
+        if user_doc.exists:
+            user_data = user_doc.to_dict()
+            session['role'] = user_data.get('role', 'user')
+            session['firstName'] = user_data.get('firstName', 'user')
+            session['lastName'] = user_data.get('lastName', 'user')
+        
+        return jsonify({
+            "message": "Login successful",
+            "userId": user.uid,
+            "email": data['email'],
+            "role": session['role']
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 401
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.clear()
+    return jsonify({"message": "Logged out successfully"})
+
+@app.route('/check_auth', methods=['GET', 'OPTIONS'])
+def check_auth():
+    if request.method == 'OPTIONS':
+        return '', 200
+        
+    if 'user_id' in session:
+        return jsonify({
+            "isAuthenticated": True,
+            "userId": session['user_id'],
+            "email": session['email'],
+            "role": session['role']
+        })
+    return jsonify({"isAuthenticated": False}), 401
+
+
+def send_ticket_email(user_email, data, documentId, type):
+    sender_email = "" # Replace with your email address
+    sender_password = "" # Replace with your email (App) Password
+    receiver_email = user_email
+
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = receiver_email
+    message["Subject"] = f"New {type} Created - {documentId}"
+
+    body = f"A new ticket has been created:\nTitle: {data['title']}\nDescription: {data['description']}\n\nBy {session.get('firstName')} {session.get('lastName')}"
+    message.attach(MIMEText(body, "plain"))
+
+    try:
+        # SMTP Server
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.send_message(message)
+        server.quit()
+        print("Email sent successfully")
+    except Exception as e:
+        print(f"Error sending email: {e}")
+
+
 # ===== USERS CRUD =====
 
 @app.route('/create_user', methods=['POST'])
@@ -94,6 +179,8 @@ def create_user():
         # Create session for the user
         session['user_id'] = user_record.uid
         session['email'] = data['email']
+        session['firstName'] = data['firstName']
+        session['lastName'] = data['lastName']
         session['role'] = 'user'
         
         return jsonify({
@@ -106,59 +193,6 @@ def create_user():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/login', methods=['POST', 'OPTIONS'])
-def login():
-    if request.method == 'OPTIONS':
-        return '', 200
-        
-    data = request.get_json()
-    
-    if 'email' not in data or 'password' not in data:
-        return jsonify({'error': 'Email and password are required'}), 400
-    
-    try:
-        # Verify user credentials with Firebase
-        user = auth.get_user_by_email(data['email'])
-        
-        # Set session data
-        session.permanent = True
-        session['user_id'] = user.uid
-        session['email'] = data['email']
-        
-        # Get user role from Firestore
-        user_doc = db.collection('users').document(user.uid).get()
-        if user_doc.exists:
-            user_data = user_doc.to_dict()
-            session['role'] = user_data.get('role', 'user')
-        
-        return jsonify({
-            "message": "Login successful",
-            "userId": user.uid,
-            "email": data['email'],
-            "role": session['role']
-        })
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 401
-
-@app.route('/logout', methods=['POST'])
-def logout():
-    session.clear()
-    return jsonify({"message": "Logged out successfully"})
-
-@app.route('/check_auth', methods=['GET', 'OPTIONS'])
-def check_auth():
-    if request.method == 'OPTIONS':
-        return '', 200
-        
-    if 'user_id' in session:
-        return jsonify({
-            "isAuthenticated": True,
-            "userId": session['user_id'],
-            "email": session['email'],
-            "role": session['role']
-        })
-    return jsonify({"isAuthenticated": False}), 401
 
 @app.route('/get_user', methods=['GET'])
 @require_auth
@@ -269,6 +303,11 @@ def create_ticket():
     
     # Add ticket to Firestore with auto-generated ID
     ticket_ref = db.collection('tickets').add(ticket_data)
+    
+    # Send email notification to receiver
+    user_email = ""
+    if user_email:
+        send_ticket_email(user_email, ticket_data, ticket_ref[1].id, "Ticket")
     
     return jsonify({'ticketId': ticket_ref[1].id})
 
