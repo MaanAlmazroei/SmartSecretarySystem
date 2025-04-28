@@ -3,10 +3,9 @@ import "./UserAppointments.css";
 import {
   createAppointment,
   getUserAllAppointments,
+  checkAuth,
 } from "../../../services/ApiService";
-import { getCurrentUser } from "../../../services/FirebaseAuth";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../../services/FirebaseConfig";
+import { useAuth } from "../../../Context/AuthContext";
 
 const UserAppointments = () => {
   const initialAppointmentState = {
@@ -45,12 +44,12 @@ const UserAppointments = () => {
   const [errors, setErrors] = useState({});
   const [appointmentsList, setAppointmentsList] = useState([]);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
-  const [currentUser, setCurrentUser] = useState(getCurrentUser());
+  const { user } = useAuth();
 
   const fetchAppointments = async () => {
-    if (currentUser?.uid) {
+    if (user?.uid) {
       try {
-        const response = await getUserAllAppointments(currentUser.uid);
+        const response = await getUserAllAppointments(user.uid);
         if (response.error) {
           throw new Error(response.error);
         }
@@ -65,18 +64,21 @@ const UserAppointments = () => {
 
   useEffect(() => {
     fetchAppointments();
-  }, [currentUser?.uid]);
+  }, [user?.uid]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setCurrentUser(user);
-      } else {
-        setCurrentUser(null);
+    const checkAuthStatus = async () => {
+      try {
+        const response = await checkAuth();
+        if (response.error) {
+          // Handle unauthorized access
+          console.error("Authentication error:", response.error);
+        }
+      } catch (error) {
+        console.error("Error checking auth status:", error);
       }
-    });
-
-    return () => unsubscribe();
+    };
+    checkAuthStatus();
   }, []);
 
   const validateForm = () => {
@@ -123,7 +125,7 @@ const UserAppointments = () => {
 
     const now = new Date().toISOString();
 
-    if (!currentUser) {
+    if (!user) {
       console.error("No user logged in.");
       return;
     }
@@ -133,7 +135,7 @@ const UserAppointments = () => {
         ...appointment,
         createdAt: now,
         lastUpdatedDate: now,
-        userId: currentUser.uid,
+        userId: user.uid,
       });
 
       if (response.error) {

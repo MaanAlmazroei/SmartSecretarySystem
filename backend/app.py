@@ -1,15 +1,30 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from firebase_admin import firestore, auth
 from firebase_config import db
 import functools
 from flask_cors import CORS
+import secrets
+from datetime import timedelta
 
 app = Flask(__name__)
+app.secret_key = secrets.token_hex(16)  # Generate a secure secret key
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
+app.config['SESSION_COOKIE_SECURE'] = False  # Set to False for development
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-#-----------------------------------
-# FOR TESTING ONLY!!
-#-----------------------------------
-CORS(app)
+# Configure CORS with proper settings
+CORS(app, 
+     resources={
+         r"/*": {
+             "origins": ["http://localhost:3000"],
+             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+             "allow_headers": ["Content-Type", "Authorization"],
+             "supports_credentials": True,
+             "expose_headers": ["Set-Cookie"]
+         }
+     })
 
 db = firestore.client()
 
@@ -29,12 +44,8 @@ def require_auth(f):
     """Decorator to require authentication for endpoints."""
     @functools.wraps(f)
     def decorated_function(*args, **kwargs):
-        token = request.headers.get('Authorization')
-        decoded_token = verify_id_token(token)
-        if not decoded_token:
+        if not session.get('user_id'):
             return jsonify({'error': 'Authentication required'}), 401
-        # Add the decoded token to the request context
-        request.user = decoded_token
         return f(*args, **kwargs)
     return decorated_function
 
@@ -42,18 +53,10 @@ def require_secretary_role(f):
     """Decorator to require secretary role for endpoints."""
     @functools.wraps(f)
     def decorated_function(*args, **kwargs):
-        token = request.headers.get('Authorization')
-        decoded_token = verify_id_token(token)
-        if not decoded_token:
+        if not session.get('user_id'):
             return jsonify({'error': 'Authentication required'}), 401
-        
-        # Check if user has secretary role
-        user_doc = db.collection('users').document(decoded_token['uid']).get()
-        if not user_doc.exists or user_doc.to_dict().get('role') != 'secretary':
+        if session.get('role') != 'secretary':
             return jsonify({'error': 'Secretary permission required'}), 403
-        
-        # Add the decoded token to the request context
-        request.user = decoded_token
         return f(*args, **kwargs)
     return decorated_function
 
@@ -69,13 +72,6 @@ def create_user():
         if field not in data:
             return jsonify({'error': f'Missing required field: {field}'}), 400
     
-    # Extract validated user data fields
-    user_data = {
-        'firstName': data['firstName'],
-        'lastName': data['lastName'],
-        'phone': data['phone']
-    }
-    
     try:
         # Create user in Firebase Auth
         user_record = auth.create_user(
@@ -83,19 +79,86 @@ def create_user():
             password=data['password']
         )
 
-        # Store user data in Firestore with auth UID as document ID
-        db.collection('users').document(user_record.uid).set({
-            **user_data,
+        # Store user data in Firestore
+        user_data = {
+            'firstName': data['firstName'],
+            'lastName': data['lastName'],
+            'phone': data['phone'],
             'role': 'user',
             'createdAt': firestore.SERVER_TIMESTAMP,
             'lastUpdatedDate': firestore.SERVER_TIMESTAMP,
-        })
+        }
         
-        return jsonify({"message": "User created successfully", "userId": user_record.uid}), 201
+        db.collection('users').document(user_record.uid).set(user_data)
+        
+        # Create session for the user
+        session['user_id'] = user_record.uid
+        session['email'] = data['email']
+        session['role'] = 'user'
+        
+        return jsonify({
+            "message": "User created successfully",
+            "userId": user_record.uid,
+            "email": data['email'],
+            "role": "user"
+        }), 201
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/login', methods=['POST', 'OPTIONS'])
+def login():
+    if request.method == 'OPTIONS':
+        return '', 200
+        
+    data = request.get_json()
+    
+    if 'email' not in data or 'password' not in data:
+        return jsonify({'error': 'Email and password are required'}), 400
+    
+    try:
+        # Verify user credentials with Firebase
+        user = auth.get_user_by_email(data['email'])
+        
+        # Set session data
+        session.permanent = True
+        session['user_id'] = user.uid
+        session['email'] = data['email']
+        
+        # Get user role from Firestore
+        user_doc = db.collection('users').document(user.uid).get()
+        if user_doc.exists:
+            user_data = user_doc.to_dict()
+            session['role'] = user_data.get('role', 'user')
+        
+        return jsonify({
+            "message": "Login successful",
+            "userId": user.uid,
+            "email": data['email'],
+            "role": session['role']
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 401
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.clear()
+    return jsonify({"message": "Logged out successfully"})
+
+@app.route('/check_auth', methods=['GET', 'OPTIONS'])
+def check_auth():
+    if request.method == 'OPTIONS':
+        return '', 200
+        
+    if 'user_id' in session:
+        return jsonify({
+            "isAuthenticated": True,
+            "userId": session['user_id'],
+            "email": session['email'],
+            "role": session['role']
+        })
+    return jsonify({"isAuthenticated": False}), 401
 
 @app.route('/get_user', methods=['GET'])
 @require_auth
@@ -105,7 +168,7 @@ def get_user():
         return jsonify({'error': 'userId is required'}), 400
     
     # Users can only get their own data unless they're a secretary
-    current_user_id = request.user['uid']
+    current_user_id = session.get('user_id')
     user_doc = db.collection('users').document(current_user_id).get()
     user_role = user_doc.to_dict().get('role') if user_doc.exists else 'user'
     
@@ -139,7 +202,7 @@ def update_user():
         return jsonify({'error': 'userId is required'}), 400
     
     user_id = data['userId']
-    current_user_id = request.user['uid']
+    current_user_id = session.get('user_id')
     
     # Only allow users to update their own data unless they're a secretary
     user_doc = db.collection('users').document(current_user_id).get()
@@ -199,7 +262,7 @@ def create_ticket():
         'description': data['description'],
         'status': 'In Progress',  # Default status for tickets
         'feedback': '',  # Default empty feedback
-        'userId': request.user['uid'],
+        'userId': session.get('user_id'),
         'createdAt': firestore.SERVER_TIMESTAMP,
         'lastUpdatedDate': firestore.SERVER_TIMESTAMP,
     }
@@ -222,7 +285,7 @@ def get_ticket():
         return jsonify({'error': 'Ticket not found'}), 404
     
     ticket_data = ticket_doc.to_dict()
-    current_user_id = request.user['uid']
+    current_user_id = session.get('user_id')
     
     # Check if the user is the owner of the ticket or a secretary
     user_doc = db.collection('users').document(current_user_id).get()
@@ -251,10 +314,10 @@ def get_all_tickets():
 def get_user_tickets():
     user_id = request.args.get('userId')
     if not user_id:
-        user_id = request.user['uid']
+        user_id = session.get('user_id')
     
     # If trying to access another user's tickets, check if secretary
-    current_user_id = request.user['uid']
+    current_user_id = session.get('user_id')
     if user_id != current_user_id:
         user_doc = db.collection('users').document(current_user_id).get()
         user_role = user_doc.to_dict().get('role') if user_doc.exists else 'user'
@@ -321,7 +384,7 @@ def delete_ticket():
         return jsonify({'error': 'Ticket not found'}), 404
     
     ticket_data = ticket_doc.to_dict()
-    current_user_id = request.user['uid']
+    current_user_id = session.get('user_id')
     
     # Check if the user is the owner of the ticket or a secretary
     user_doc = db.collection('users').document(current_user_id).get()
@@ -355,7 +418,7 @@ def create_appointment():
         'appointmentTime': data['appointmentTime'],
         'status': 'In Progress',  # Default status for appointments
         'feedback': '',  # Default empty feedback
-        'userId': request.user['uid'],
+        'userId': session.get('user_id'),
         'createdAt': firestore.SERVER_TIMESTAMP,
         'lastUpdatedDate': firestore.SERVER_TIMESTAMP,
     }
@@ -378,7 +441,7 @@ def get_appointment():
         return jsonify({'error': 'Appointment not found'}), 404
     
     appointment_data = appointment_doc.to_dict()
-    current_user_id = request.user['uid']
+    current_user_id = session.get('user_id')
     
     # Check if the user is the owner of the appointment or a secretary
     user_doc = db.collection('users').document(current_user_id).get()
@@ -407,10 +470,10 @@ def get_all_appointments():
 def get_user_appointments():
     user_id = request.args.get('userId')
     if not user_id:
-        user_id = request.user['uid']
+        user_id = session.get('user_id')
     
     # If trying to access another user's appointments, check if secretary
-    current_user_id = request.user['uid']
+    current_user_id = session.get('user_id')
     if user_id != current_user_id:
         user_doc = db.collection('users').document(current_user_id).get()
         user_role = user_doc.to_dict().get('role') if user_doc.exists else 'user'
@@ -477,7 +540,7 @@ def delete_appointment():
         return jsonify({'error': 'Appointment not found'}), 404
     
     appointment_data = appointment_doc.to_dict()
-    current_user_id = request.user['uid']
+    current_user_id = session.get('user_id')
     
     # Check if the user is the owner of the appointment or a secretary
     user_doc = db.collection('users').document(current_user_id).get()

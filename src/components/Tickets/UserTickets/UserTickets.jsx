@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./UserTickets.css";
-import { getCurrentUser } from "../../../services/FirebaseAuth";
 import { getUserAllTickets, createTicket } from "../../../services/ApiService";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../../services/FirebaseConfig";
+import { useAuth } from "../../../Context/AuthContext";
 
 const UserTickets = () => {
   const initialTicketState = {
@@ -19,12 +17,12 @@ const UserTickets = () => {
   const [errors, setErrors] = useState({});
   const [ticketsList, setTicketsList] = useState([]);
   const [selectedTicketId, setSelectedTicketId] = useState(null);
-  const [currentUser, setCurrentUser] = useState(getCurrentUser());
+  const { user } = useAuth();
 
   const fetchTickets = async () => {
-    if (currentUser?.uid) {
+    if (user?.uid) {
       try {
-        const response = await getUserAllTickets(currentUser.uid);
+        const response = await getUserAllTickets(user.uid);
         if (response.error) {
           throw new Error(response.error);
         }
@@ -39,19 +37,7 @@ const UserTickets = () => {
 
   useEffect(() => {
     fetchTickets();
-  }, [currentUser?.uid]);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setCurrentUser(user);
-      } else {
-        setCurrentUser(null);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
+  }, [user?.uid]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -90,7 +76,7 @@ const UserTickets = () => {
         ...ticket,
         createdAt: now,
         lastUpdatedDate: now,
-        userId: currentUser.uid,
+        userId: user.uid,
       });
 
       if (response.error) {
