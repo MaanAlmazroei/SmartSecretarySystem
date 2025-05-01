@@ -133,9 +133,9 @@ const Profile = () => {
 
         <div className="profile-details">
           {activeTab === "settings" ? (
-            <div className="settings-section">
+            <div className="profile-settings-section">
               <h2>Account Settings</h2>
-              <div className="setting-item">
+              <div className="profile-setting-item">
                 <label>
                   <input
                     type="checkbox"
@@ -146,7 +146,7 @@ const Profile = () => {
                   Email Notifications
                 </label>
               </div>
-              <div className="setting-item">
+              <div className="profile-setting-item">
                 <label>Language</label>
                 <select
                   name="language"
@@ -158,11 +158,11 @@ const Profile = () => {
               </div>
             </div>
           ) : (
-            <div className="overview-section">
+            <div className="profile-overview-section">
               <div className="profile-header">
                 <h2>Profile Overview</h2>
                 <button
-                  className="edit-button"
+                  className="profile-edit-button"
                   onClick={() => setEditMode(!editMode)}
                 >
                   {editMode ? "Cancel" : "Edit Profile"}
@@ -170,7 +170,7 @@ const Profile = () => {
               </div>
 
               <form onSubmit={handleSubmit}>
-                <div className="form-group">
+                <div className="profile-form-group">
                   <label>First Name</label>
                   <input
                     type="text"
@@ -181,7 +181,7 @@ const Profile = () => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="profile-form-group">
                   <label>Last Name</label>
                   <input
                     type="text"
@@ -192,7 +192,7 @@ const Profile = () => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="profile-form-group">
                   <label>Email</label>
                   <input
                     type="email"
@@ -202,7 +202,7 @@ const Profile = () => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="profile-form-group">
                   <label>Phone</label>
                   <input
                     type="tel"
@@ -214,8 +214,8 @@ const Profile = () => {
                 </div>
 
                 {editMode && (
-                  <div className="form-actions">
-                    <button type="submit" className="save-button">
+                  <div className="profile-form-actions">
+                    <button type="submit" className="profile-save-button">
                       Save Changes
                     </button>
                   </div>
