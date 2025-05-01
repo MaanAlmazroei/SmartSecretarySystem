@@ -125,19 +125,6 @@
   color: #d32f2f;
 }
 
-.nosec-resources-dates {
-  margin-top: 1rem;
-  font-size: 0.9rem;
-  color: #666;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.nosec-resources-dates span {
-  display: block;
-}
-
 .nosec-resources-sectionActions {
   display: flex;
   align-items: center;

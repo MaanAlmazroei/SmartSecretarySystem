@@ -11,11 +11,15 @@ const Layout = ({ children }) => {
   const showChatbot = !noChatbotPaths.includes(location.pathname);
 
   return (
-    <div className="layout">
-      <Header />
-      <main className="main">{children}</main>
+    <div className="Layout-layout">
+      <header className="Layout-header">
+        <Header />
+      </header>
+      <main className="Layout-main">{children}</main>
       {showChatbot && <Chatbot />}
-      <Footer />
+      <footer className="Layout-footer">
+        <Footer />
+      </footer>
     </div>
   );
 };

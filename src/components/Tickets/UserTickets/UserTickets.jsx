@@ -121,28 +121,28 @@ const UserTickets = () => {
   const getStatusClass = (status) => {
     switch (status) {
       case "In Progress":
-        return "ticket-status-in-progress";
+        return "UserTickets-status-in-progress";
       case "Resolved":
-        return "ticket-status-resolved";
+        return "UserTickets-status-resolved";
       default:
         return "";
     }
   };
 
   return (
-    <div className="tickets-container">
-      <header className="tickets-header">
+    <div className="UserTickets-container">
+      <header className="UserTickets-header">
         <h1>Tickets Management</h1>
         <p>Create and track support tickets</p>
       </header>
 
-      <div className="tickets-main">
-        {/* Left Panel: Ticket List and Booking Button */}
-        <section className="tickets-list-section">
-          <div className="section-header">
+      <div className="UserTickets-main">
+        {/* Left Panel: Ticket List and New Ticket Button */}
+        <section className="UserTickets-list-section">
+          <div className="UserTickets-section-header">
             <h2>Your Tickets</h2>
             <button
-              className="new-ticket-btn"
+              className="UserTickets-new-ticket-btn"
               onClick={() => {
                 setTicket({ ...initialTicketState });
                 setSelectedTicketId(null);
@@ -153,34 +153,34 @@ const UserTickets = () => {
           </div>
 
           {ticketsList.length === 0 ? (
-            <div className="no-tickets">
+            <div className="UserTickets-no-tickets">
               <p>No tickets found. Create a new ticket to get started.</p>
             </div>
           ) : (
-            <div className="tickets-list">
+            <div className="UserTickets-list">
               {ticketsList.map((t) => (
                 <div
                   key={t.id}
-                  className={`ticket-item ${
-                    selectedTicketId === t.id ? "selected" : ""
+                  className={`UserTickets-item ${
+                    selectedTicketId === t.id ? "UserTickets-selected" : ""
                   }`}
                   onClick={() => selectTicket(t.id)}
                 >
-                  <div className="ticket-header">
+                  <div className="UserTickets-item-header">
                     <h3>{t.title}</h3>
                     <span
-                      className={`ticket-status ${getStatusClass(t.status)}`}
+                      className={`UserTickets-status ${getStatusClass(t.status)}`}
                     >
                       {t.status}
                     </span>
                   </div>
-                  <div className="ticket-dates">
+                  <div className="UserTickets-dates">
                     <span>Created: {formatDate(t.createdAt)}</span>
                     {t.createdAt !== t.lastUpdatedDate && (
                       <span>Updated: {formatDate(t.lastUpdatedDate)}</span>
                     )}
                   </div>
-                  <p className="ticket-description">
+                  <p className="UserTickets-description">
                     {t.description.substring(0, 100)}...
                   </p>
                 </div>
@@ -190,48 +190,50 @@ const UserTickets = () => {
         </section>
 
         {/* Right Panel: Ticket Detail View */}
-        <section className="ticket-detail-section">
+        <section className="UserTickets-detail-section">
           {selectedTicketId ? (
-            <div className="ticket-detail">
-              <div className="detail-header">
+            <div className="UserTickets-detail">
+              <div className="UserTickets-detail-header">
                 <h2>{ticket.title}</h2>
                 <span
-                  className={`ticket-status ${getStatusClass(ticket.status)}`}
+                  className={`UserTickets-status ${getStatusClass(ticket.status)}`}
                 >
                   {ticket.status}
                 </span>
               </div>
 
-              <div className="detail-metadata">
-                <div className="metadata-item">
-                  <span className="label">Submitted on:</span>
+              <div className="UserTickets-detail-metadata">
+                <div className="UserTickets-metadata-item">
+                  <span className="UserTickets-label">Submitted on:</span>
                   <span>{formatDate(ticket.createdAt)}</span>
                 </div>
                 {ticket.createdAt !== ticket.lastUpdatedDate && (
-                  <div className="metadata-item">
-                    <span className="label">Last updated:</span>
+                  <div className="UserTickets-metadata-item">
+                    <span className="UserTickets-label">Last updated:</span>
                     <span>{formatDate(ticket.lastUpdatedDate)}</span>
                   </div>
                 )}
               </div>
 
-              <div className="detail-description">
+              <div className="UserTickets-detail-description">
                 <h3>Description</h3>
                 <p>{ticket.description}</p>
               </div>
 
-              <div className="detail-feedback">
-                <h3>Feedback</h3>
-                <p>{ticket.feedback || "No feedback provided yet"}</p>
-              </div>
+              {ticket.feedback && (
+                <div className="UserTickets-detail-feedback">
+                  <h3>Feedback</h3>
+                  <p>{ticket.feedback}</p>
+                </div>
+              )}
 
-              <div className="detail-actions">
+              <div className="UserTickets-detail-actions">
                 <button onClick={handleCancel}>Close</button>
               </div>
             </div>
           ) : (
-            <form className="ticket-form" onSubmit={handleSubmit}>
-              <div className="form-group">
+            <form className="UserTickets-form" onSubmit={handleSubmit}>
+              <div className="UserTickets-form-group">
                 <label htmlFor="title">Ticket Title *</label>
                 <input
                   type="text"
@@ -239,32 +241,32 @@ const UserTickets = () => {
                   name="title"
                   value={ticket.title}
                   onChange={handleInputChange}
-                  className={`form-control ${errors.title ? "error" : ""}`}
+                  className={`UserTickets-form-control ${errors.title ? "UserTickets-error" : ""}`}
                 />
                 {errors.title && (
-                  <span className="error-message">{errors.title}</span>
+                  <span className="UserTickets-error-message">{errors.title}</span>
                 )}
               </div>
 
-              <div className="form-group">
+              <div className="UserTickets-form-group">
                 <label htmlFor="description">Description *</label>
                 <textarea
                   id="description"
                   name="description"
                   value={ticket.description}
                   onChange={handleInputChange}
-                  className={`form-control ${
-                    errors.description ? "error" : ""
+                  className={`UserTickets-form-control ${
+                    errors.description ? "UserTickets-error" : ""
                   }`}
                   rows="5"
                 />
                 {errors.description && (
-                  <span className="error-message">{errors.description}</span>
+                  <span className="UserTickets-error-message">{errors.description}</span>
                 )}
               </div>
 
-              <div className="form-actions">
-                <button type="submit" className="submit-btn">
+              <div className="UserTickets-form-actions">
+                <button type="submit" className="UserTickets-submit-btn">
                   Submit Ticket
                 </button>
               </div>

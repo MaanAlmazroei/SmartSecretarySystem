@@ -71,7 +71,6 @@ const UserAppointments = () => {
       try {
         const response = await checkAuth();
         if (response.error) {
-          // Handle unauthorized access
           console.error("Authentication error:", response.error);
         }
       } catch (error) {
@@ -180,30 +179,30 @@ const UserAppointments = () => {
   const getStatusClass = (status) => {
     switch (status) {
       case "In Progress":
-        return "appointment-status-in-progress";
+        return "UserAppointments-status-in-progress";
       case "Approved":
-        return "appointment-status-approved";
+        return "UserAppointments-status-approved";
       case "Rejected":
-        return "appointment-status-rejected";
+        return "UserAppointments-status-rejected";
       default:
         return "";
     }
   };
 
   return (
-    <div className="appointments-container">
-      <header className="appointments-header">
+    <div className="UserAppointments-container">
+      <header className="UserAppointments-header">
         <h1>Appointments Management</h1>
         <p>Schedule and track appointments</p>
       </header>
 
-      <div className="appointments-main">
+      <div className="UserAppointments-main">
         {/* Left Panel: Appointment List and New Appointment Button */}
-        <section className="appointments-list-section">
-          <div className="section-header">
+        <section className="UserAppointments-list-section">
+          <div className="UserAppointments-section-header">
             <h2>Your Appointments</h2>
             <button
-              className="new-appointment-btn"
+              className="UserAppointments-new-appointment-btn"
               onClick={() => {
                 setAppointment({ ...initialAppointmentState });
                 setSelectedAppointmentId(null);
@@ -214,38 +213,34 @@ const UserAppointments = () => {
           </div>
 
           {appointmentsList.length === 0 ? (
-            <div className="no-appointments">
-              <p>
-                No appointments found. Create a new appointment to get started.
-              </p>
+            <div className="UserAppointments-no-appointments">
+              <p>No appointments found. Create a new appointment to get started.</p>
             </div>
           ) : (
-            <div className="appointments-list">
+            <div className="UserAppointments-list">
               {appointmentsList.map((a) => (
                 <div
                   key={a.id}
-                  className={`appointment-item ${
-                    selectedAppointmentId === a.id ? "selected" : ""
+                  className={`UserAppointments-item ${
+                    selectedAppointmentId === a.id ? "UserAppointments-selected" : ""
                   }`}
                   onClick={() => selectAppointment(a.id)}
                 >
-                  <div className="appointment-header">
+                  <div className="UserAppointments-item-header">
                     <h3>{a.title}</h3>
                     <span
-                      className={`appointment-status ${getStatusClass(
-                        a.status
-                      )}`}
+                      className={`UserAppointments-status ${getStatusClass(a.status)}`}
                     >
                       {a.status}
                     </span>
                   </div>
-                  <div className="appointment-dates">
+                  <div className="UserAppointments-dates">
                     <span>Created: {formatDate(a.createdAt)}</span>
                     {a.createdAt !== a.lastUpdatedDate && (
                       <span>Updated: {formatDate(a.lastUpdatedDate)}</span>
                     )}
                   </div>
-                  <p className="appointment-description">
+                  <p className="UserAppointments-description">
                     {a.description.substring(0, 100)}...
                   </p>
                 </div>
@@ -255,59 +250,56 @@ const UserAppointments = () => {
         </section>
 
         {/* Right Panel: Appointment Detail View */}
-        <section className="user-appointment-detail-section">
+        <section className="UserAppointments-detail-section">
           {selectedAppointmentId ? (
-            <div className="appointment-detail">
-              <div className="user-appointment-detail-header">
+            <div>
+              <div className="UserAppointments-detail-header">
                 <h2>{appointment.title}</h2>
                 <span
-                  className={`appointment-status ${getStatusClass(
-                    appointment.status
-                  )}`}
+                  className={`UserAppointments-status ${getStatusClass(appointment.status)}`}
                 >
                   {appointment.status}
                 </span>
               </div>
 
-              <div className="detail-metadata">
-                <div className="metadata-item">
-                  <span className="label">Scheduled for:</span>
+              <div className="UserAppointments-detail-metadata">
+                <div className="UserAppointments-metadata-item">
+                  <span className="UserAppointments-label">Scheduled for:</span>
                   <span>
-                    {appointment.appointmentDate} at{" "}
-                    {appointment.appointmentTime}
+                    {appointment.appointmentDate} at {appointment.appointmentTime}
                   </span>
                 </div>
-                <div className="metadata-item">
-                  <span className="label">Created on:</span>
+                <div className="UserAppointments-metadata-item">
+                  <span className="UserAppointments-label">Created on:</span>
                   <span>{formatDate(appointment.createdAt)}</span>
                 </div>
                 {appointment.createdAt !== appointment.lastUpdatedDate && (
-                  <div className="metadata-item">
-                    <span className="label">Last updated:</span>
+                  <div className="UserAppointments-metadata-item">
+                    <span className="UserAppointments-label">Last updated:</span>
                     <span>{formatDate(appointment.lastUpdatedDate)}</span>
                   </div>
                 )}
               </div>
 
-              <div className="detail-description">
+              <div className="UserAppointments-detail-description">
                 <h3>Description</h3>
                 <p>{appointment.description}</p>
               </div>
 
               {appointment.feedback && (
-                <div className="detail-feedback">
+                <div className="UserAppointments-detail-feedback">
                   <h3>Feedback</h3>
                   <p>{appointment.feedback}</p>
                 </div>
               )}
 
-              <div className="detail-actions">
+              <div className="UserAppointments-detail-actions">
                 <button onClick={handleCancel}>Close</button>
               </div>
             </div>
           ) : (
-            <form className="appointment-form" onSubmit={handleSubmit}>
-              <div className="form-group">
+            <form className="UserAppointments-form" onSubmit={handleSubmit}>
+              <div className="UserAppointments-form-group">
                 <label htmlFor="title">Appointment Title *</label>
                 <input
                   type="text"
@@ -315,14 +307,14 @@ const UserAppointments = () => {
                   name="title"
                   value={appointment.title}
                   onChange={handleInputChange}
-                  className={`form-control ${errors.title ? "error" : ""}`}
+                  className={`UserAppointments-form-control ${errors.title ? "UserAppointments-error" : ""}`}
                 />
                 {errors.title && (
-                  <span className="error-message">{errors.title}</span>
+                  <span className="UserAppointments-error-message">{errors.title}</span>
                 )}
               </div>
 
-              <div className="form-group">
+              <div className="UserAppointments-form-group">
                 <label htmlFor="appointmentDate">Date *</label>
                 <input
                   type="date"
@@ -330,25 +322,25 @@ const UserAppointments = () => {
                   name="appointmentDate"
                   value={appointment.appointmentDate}
                   onChange={handleInputChange}
-                  className={`form-control ${
-                    errors.appointmentDate ? "error" : ""
+                  className={`UserAppointments-form-control ${
+                    errors.appointmentDate ? "UserAppointments-error" : ""
                   }`}
                 />
                 {errors.appointmentDate && (
-                  <span className="error-message">
+                  <span className="UserAppointments-error-message">
                     {errors.appointmentDate}
                   </span>
                 )}
               </div>
 
-              <div className="form-group">
+              <div className="UserAppointments-form-group">
                 <label>Time Slot *</label>
-                <div className="time-slots-container">
+                <div className="UserAppointments-time-slots-container">
                   {timeSlots.map((time) => (
                     <div
                       key={time}
-                      className={`time-slot ${
-                        appointment.appointmentTime === time ? "selected" : ""
+                      className={`UserAppointments-time-slot ${
+                        appointment.appointmentTime === time ? "UserAppointments-selected" : ""
                       }`}
                       onClick={() => handleTimeSelect(time)}
                     >
@@ -357,31 +349,31 @@ const UserAppointments = () => {
                   ))}
                 </div>
                 {errors.appointmentTime && (
-                  <span className="error-message">
+                  <span className="UserAppointments-error-message">
                     {errors.appointmentTime}
                   </span>
                 )}
               </div>
 
-              <div className="form-group">
+              <div className="UserAppointments-form-group">
                 <label htmlFor="description">Description *</label>
                 <textarea
                   id="description"
                   name="description"
                   value={appointment.description}
                   onChange={handleInputChange}
-                  className={`form-control ${
-                    errors.description ? "error" : ""
+                  className={`UserAppointments-form-control ${
+                    errors.description ? "UserAppointments-error" : ""
                   }`}
                   rows="5"
                 />
                 {errors.description && (
-                  <span className="error-message">{errors.description}</span>
+                  <span className="UserAppointments-error-message">{errors.description}</span>
                 )}
               </div>
 
-              <div className="form-actions">
-                <button type="submit" className="submit-btn">
+              <div className="UserAppointments-form-actions">
+                <button type="submit" className="UserAppointments-submit-btn">
                   Schedule Appointment
                 </button>
               </div>

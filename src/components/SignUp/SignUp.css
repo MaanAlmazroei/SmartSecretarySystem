@@ -188,19 +188,6 @@
   color: #f44336;
 }
 
-.signUp-passwordMatch {
-  margin-top: 0.5rem;
-  font-size: 0.8rem;
-}
-
-.signUp-passwordMatch.valid {
-  color: #4caf50;
-}
-
-.signUp-passwordMatch.invalid {
-  color: #f44336;
-}
-
 .signUp-submitButton:disabled {
   background-color: #cccccc;
   cursor: not-allowed;

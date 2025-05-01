@@ -1,4 +1,7 @@
-.header {
+.Header-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000; /* Ensure it stays above other content */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -7,32 +10,32 @@
   box-shadow: 0 6px 6px rgba(0, 0, 0, 0.5);
 }
 
-.logo {
+.Header-logo {
   display: flex;
   width: 65px;
   height: 65px;
   flex: 0 0 auto;
 }
 
-.logo img {
+.Header-logo img {
   width: 65px;
   height: 65px;
 }
 
-nav {
+.Header-nav {
   display: flex;
   align-items: center;
   flex: 1;
   justify-content: center;
 }
 
-.nav-center {
+.Header-nav-center {
   display: flex;
   justify-content: center;
   width: 100%;
 }
 
-nav ul {
+.Header-nav ul {
   list-style: none;
   display: flex;
   gap: 90px;
@@ -41,11 +44,11 @@ nav ul {
   justify-content: center;
 }
 
-nav ul li {
+.Header-nav ul li {
   text-align: center;
 }
 
-nav ul li a {
+.Header-nav ul li a {
   color: black;
   text-decoration: none;
   font-size: 21px;
@@ -55,23 +58,23 @@ nav ul li a {
   padding: 5px 0;
 }
 
-nav ul li a:hover {
+.Header-nav ul li a:hover {
   color: white;
   background-color: #1a1a1a;
   border-radius: 7px;
   padding: 5px 10px;
 }
 
-.signup-container {
+.Header-signup-container {
   display: flex;
   gap: 12px;
   align-items: center;
   flex: 0 0 auto;
 }
 
-.signup,
-.login,
-.logout-btn {
+.Header-signup,
+.Header-login,
+.Header-logout-btn {
   white-space: nowrap;
   display: flex;
   background-color: #1a1a1a;
@@ -84,14 +87,14 @@ nav ul li a:hover {
   transition: background-color 0.3s;
 }
 
-.signup:hover,
-.login:hover,
-.logout-btn:hover {
+.Header-signup:hover,
+.Header-login:hover,
+.Header-logout-btn:hover {
   background-color: black;
   box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.2);
 }
 
-.menu-btn {
+.Header-menu-btn {
   display: none;
   cursor: pointer;
   position: relative;
@@ -100,7 +103,7 @@ nav ul li a:hover {
   z-index: 1001;
 }
 
-.menu-btn span {
+.Header-menu-btn span {
   display: block;
   position: absolute;
   height: 3px;
@@ -110,76 +113,72 @@ nav ul li a:hover {
   transition: all 0.3s ease;
 }
 
-.menu-btn span:nth-child(1) {
+.Header-menu-btn span:nth-child(1) {
   top: 0;
 }
-.menu-btn span:nth-child(2) {
+.Header-menu-btn span:nth-child(2) {
   top: 50%;
   transform: translateY(-50%);
 }
-.menu-btn span:nth-child(3) {
+.Header-menu-btn span:nth-child(3) {
   bottom: 0;
 }
 
-.menu-btn.open span:nth-child(1) {
+.Header-menu-btn.open span:nth-child(1) {
   top: 50%;
   transform: translateY(-50%) rotate(45deg);
 }
-.menu-btn.open span:nth-child(2) {
+.Header-menu-btn.open span:nth-child(2) {
   opacity: 0;
 }
-.menu-btn.open span:nth-child(3) {
+.Header-menu-btn.open span:nth-child(3) {
   bottom: 50%;
   transform: translateY(50%) rotate(-45deg);
 }
 
-.nav-active {
+.Header-nav-active {
   font-weight: bold;
   color: black;
   border-bottom: 2px solid black;
 }
 
-.signup.nav-active {
-  background-color: #2980b9;
-}
-
 @media (max-width: 1200px) {
-  nav ul {
+  .Header-nav ul {
     gap: 50px;
   }
 }
 
 @media (max-width: 992px) {
-  nav ul li a {
+  .Header-nav ul li a {
     font-size: 18px;
   }
-  .signup {
+  .Header-signup {
     font-size: 18px;
     padding: 6px 12px;
   }
 }
 
 @media (max-width: 850px) {
-  nav ul {
+  .Header-nav ul {
     gap: 30px;
   }
-  .signup-container {
+  .Header-signup-container {
     padding-right: 20px;
   }
 }
 
 @media (max-width: 768px) {
-  .nav-center,
-  .signup-container {
+  .Header-nav-center,
+  .Header-signup-container {
     display: none;
     position: relative;
     bottom: 20px;
   }
-  .menu-btn {
+  .Header-menu-btn {
     display: flex;
   }
 
-  nav.active {
+  .Header-nav.active {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -193,38 +192,25 @@ nav ul li a:hover {
     z-index: 1000;
   }
 
-  nav.active .nav-center {
+  .Header-nav.active .Header-nav-center {
     display: block;
     margin-bottom: 30px;
   }
-  nav.active ul {
+  .Header-nav.active ul {
     flex-direction: column;
     gap: 25px;
   }
-  nav.active .signup-container {
+  .Header-nav.active .Header-signup-container {
     display: block;
     padding-right: 0;
-  }
-
-  .image-text h1 {
-    font-size: 2rem;
-  }
-  .image-text p {
-    font-size: 1rem;
   }
 }
 
 @media (max-width: 480px) {
-  .image-text h1 {
-    font-size: 1.8rem;
-  }
-  .logo img {
+  .Header-logo img {
     width: 60px;
   }
-  nav ul li a {
+  .Header-nav ul li a {
     padding: 10px 20px;
-  }
-  .image-header {
-    height: 60vh;
   }
 }

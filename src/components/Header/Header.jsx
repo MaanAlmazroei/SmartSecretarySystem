@@ -24,15 +24,15 @@ const Header = () => {
   };
 
   return (
-    <header className="header">
-      <div className="logo">
+    <header className="Header-header">
+      <div className="Header-logo">
         <NavLink to="/">
           <img src={logo} alt="SSS Logo" />
         </NavLink>
       </div>
 
       <div
-        className={`menu-btn ${menuOpen ? "open" : ""}`}
+        className={`Header-menu-btn ${menuOpen ? "open" : ""}`}
         onClick={() => setMenuOpen(!menuOpen)}
       >
         <span></span>
@@ -40,13 +40,13 @@ const Header = () => {
         <span></span>
       </div>
 
-      <nav className={menuOpen ? "active" : ""}>
-        <div className="nav-center">
+      <nav className={`Header-nav ${menuOpen ? "active" : ""}`}>
+        <div className="Header-nav-center">
           <ul>
             <li>
               <NavLink
                 to="/"
-                className={({ isActive }) => (isActive ? "nav-active" : "")}
+                className={({ isActive }) => (isActive ? "Header-nav-active" : "")}
               >
                 Home
               </NavLink>
@@ -54,7 +54,7 @@ const Header = () => {
             <li>
               <NavLink
                 to="/tickets"
-                className={({ isActive }) => (isActive ? "nav-active" : "")}
+                className={({ isActive }) => (isActive ? "Header-nav-active" : "")}
               >
                 Tickets
               </NavLink>
@@ -62,7 +62,7 @@ const Header = () => {
             <li>
               <NavLink
                 to="/appointments"
-                className={({ isActive }) => (isActive ? "nav-active" : "")}
+                className={({ isActive }) => (isActive ? "Header-nav-active" : "")}
               >
                 Appointments
               </NavLink>
@@ -70,7 +70,7 @@ const Header = () => {
             <li>
               <NavLink
                 to="/resources"
-                className={({ isActive }) => (isActive ? "nav-active" : "")}
+                className={({ isActive }) => (isActive ? "Header-nav-active" : "")}
               >
                 Resources
               </NavLink>
@@ -78,7 +78,7 @@ const Header = () => {
             <li>
               <NavLink
                 to="/profile"
-                className={({ isActive }) => (isActive ? "nav-active" : "")}
+                className={({ isActive }) => (isActive ? "Header-nav-active" : "")}
               >
                 Profile
               </NavLink>
@@ -86,17 +86,17 @@ const Header = () => {
           </ul>
         </div>
       </nav>
-      <div className="signup-container">
+      <div className="Header-signup-container">
         {user ? (
-          <NavLink to="/" className="logout-btn" onClick={handleLogout}>
+          <NavLink to="/" className="Header-logout-btn" onClick={handleLogout}>
             Sign Out
           </NavLink>
         ) : (
           <>
-            <NavLink to="/login" className="login">
+            <NavLink to="/login" className="Header-login">
               Log In
             </NavLink>
-            <NavLink to="/signup" className="signup">
+            <NavLink to="/signup" className="Header-signup">
               Sign Up
             </NavLink>
           </>
