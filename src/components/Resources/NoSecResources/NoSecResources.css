@@ -137,3 +137,24 @@
 .nosec-resources-dates span {
   display: block;
 }
+
+.nosec-resources-sectionActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nosec-resources-downloadBtn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.nosec-resources-downloadBtn:hover {
+  background-color: #45a049;
+}

@@ -202,15 +202,13 @@ export const deleteAppointment = async (appointmentId) => {
 };
 
 // Resource related API calls
-export const createResource = async (resourceData) => {
+export const createResource = async (formData) => {
   const response = await fetch(`${API_BASE_URL}/create_resource`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    body: formData,
     credentials: "include",
-    body: JSON.stringify(resourceData),
   });
+
   return response.json();
 };
 
@@ -232,14 +230,25 @@ export const getAllResources = async () => {
 };
 
 export const updateResource = async (resourceId, resourceData) => {
+  const formData = new FormData();
+
+  Object.keys(resourceData).forEach((key) => {
+    if (key === "file") {
+      formData.append("file", resourceData[key]);
+    } else {
+      formData.append(key, resourceData[key]);
+    }
+  });
+
+  // Add resourceId to formData
+  formData.append("resourceId", resourceId);
+
   const response = await fetch(`${API_BASE_URL}/update_resource`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    body: formData,
     credentials: "include",
-    body: JSON.stringify({ resourceId, ...resourceData }),
   });
+
   return response.json();
 };
 

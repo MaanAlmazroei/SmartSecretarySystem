@@ -39,11 +39,6 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkAuthentication();
-
-    // Set up an interval to check authentication status periodically
-    const interval = setInterval(checkAuthentication, 30000); // Check every 30 seconds
-
-    return () => clearInterval(interval);
   }, []);
 
   const login = async (email, password) => {

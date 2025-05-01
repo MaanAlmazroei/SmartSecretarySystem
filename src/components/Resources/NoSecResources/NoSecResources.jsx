@@ -39,6 +39,20 @@ const NoSecResources = () => {
     }));
   };
 
+  const handleDownload = (fileUrl, fileName) => {
+    // Create a temporary link element
+    const link = document.createElement("a");
+    link.href = fileUrl;
+    link.style.display = "none"; // Hide the link
+    document.body.appendChild(link);
+
+    // Trigger the download
+    link.click();
+
+    // Clean up
+    document.body.removeChild(link);
+  };
+
   // Group resources by type
   const categories = resources.reduce((acc, resource) => {
     const existingCategory = acc.find((cat) => cat.title === resource.type);
@@ -49,6 +63,8 @@ const NoSecResources = () => {
         id: resource.id,
         createdAt: resource.createdAt,
         lastUpdatedDate: resource.lastUpdatedDate,
+        fileUrl: resource.fileUrl,
+        fileName: resource.fileName,
       });
     } else {
       acc.push({
@@ -60,6 +76,8 @@ const NoSecResources = () => {
             id: resource.id,
             createdAt: resource.createdAt,
             lastUpdatedDate: resource.lastUpdatedDate,
+            fileUrl: resource.fileUrl,
+            fileName: resource.fileName,
           },
         ],
       });
@@ -141,9 +159,22 @@ const NoSecResources = () => {
                         <span className="nosec-resources-sectionTitle">
                           {section.title}
                         </span>
-                        <span className="nosec-resources-icon">
-                          {isOpen ? "−" : "+"}
-                        </span>
+                        <div className="nosec-resources-sectionActions">
+                          {section.fileUrl && (
+                            <button
+                              className="nosec-resources-downloadBtn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownload(section.fileUrl);
+                              }}
+                            >
+                              Download
+                            </button>
+                          )}
+                          <span className="nosec-resources-icon">
+                            {isOpen ? "−" : "+"}
+                          </span>
+                        </div>
                       </div>
                       {isOpen && (
                         <div className="nosec-resources-content">

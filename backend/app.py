@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, session
 from firebase_admin import firestore, auth
 from firebase_config import db
+from supabase_config import storage
 import functools
 from flask_cors import CORS
 import secrets
@@ -597,7 +598,16 @@ def delete_appointment():
 @app.route('/create_resource', methods=['POST'])
 @require_secretary_role
 def create_resource():
-    data = request.get_json()
+    # Check if request is form-data
+    if request.content_type and 'multipart/form-data' in request.content_type:
+        data = {
+            'title': request.form.get('title'),
+            'description': request.form.get('description'),
+            'type': request.form.get('type'),
+            'file': request.files.get('file')
+        }
+    else:
+        data = request.get_json()
     
     # Validate required fields
     required_fields = ['title', 'description', 'type']
@@ -613,6 +623,28 @@ def create_resource():
         'createdAt': firestore.SERVER_TIMESTAMP,
         'lastUpdatedDate': firestore.SERVER_TIMESTAMP,
     }
+
+    # Handle file upload if present
+    if 'file' in data and data['file']:
+        try:
+            # Get file data and original file name
+            file_data = data['file']
+            file_name = file_data.filename  # Get the original file name from the uploaded file
+            
+            # Upload to Supabase storage using original file name
+            bucket_name = 'resources'
+            storage.from_(bucket_name).upload(file_name, file_data.read())
+
+            # Get public URL of the uploaded file
+            file_url = storage.from_(bucket_name).get_public_url(file_name)
+            # Add download parameter to force download
+            file_url = f"{file_url}download={file_name}"
+            
+            # Add file URL to resource data
+            resource_data['fileUrl'] = file_url
+            resource_data['fileName'] = file_name  # Store original file name
+        except Exception as e:
+            return jsonify({'error': f'Failed to upload file: {str(e)}'}), 500
     
     # Add resource to Firestore with auto-generated ID
     resource_ref = db.collection('resources').add(resource_data)
@@ -646,7 +678,17 @@ def get_all_resources():
 @app.route('/update_resource', methods=['PUT'])
 @require_secretary_role
 def update_resource():
-    data = request.get_json()
+    # Check if request is form-data
+    if request.content_type and 'multipart/form-data' in request.content_type:
+        data = {
+            'resourceId': request.form.get('resourceId'),
+            'title': request.form.get('title'),
+            'description': request.form.get('description'),
+            'type': request.form.get('type'),
+            'file': request.files.get('file')
+        }
+    else:
+        data = request.get_json()
     
     if 'resourceId' not in data:
         return jsonify({'error': 'resourceId is required'}), 400
@@ -664,6 +706,28 @@ def update_resource():
     for field in allowed_fields:
         if field in data:
             updated_data[field] = data[field]
+    
+    # Handle file upload if present
+    if 'file' in data and data['file']:
+        try:
+            # Get file data and original file name
+            file_data = data['file']
+            file_name = file_data.filename  # Get the original file name from the uploaded file
+            
+            # Upload to Supabase storage using original file name
+            bucket_name = 'resources'
+            storage.from_(bucket_name).upload(file_name, file_data.read())
+            
+            # Get public URL of the uploaded file
+            file_url = storage.from_(bucket_name).get_public_url(file_name)
+            # Add download parameter to force download
+            file_url = f"{file_url}download={file_name}"
+            
+            # Add file URL to resource data
+            updated_data['fileUrl'] = file_url
+            updated_data['fileName'] = file_name  # Store original file name
+        except Exception as e:
+            return jsonify({'error': f'Failed to upload file: {str(e)}'}), 500
     
     if not updated_data:
         return jsonify({'error': 'No valid fields to update'}), 400
@@ -687,8 +751,29 @@ def delete_resource():
     if not resource_doc.exists:
         return jsonify({'error': 'Resource not found'}), 404
     
-    db.collection('resources').document(resource_id).delete()
-    return jsonify({"message": "Resource deleted successfully"})
+    # Get resource data
+    resource_data = resource_doc.to_dict()
+    
+    # Delete file from Supabase if it exists
+    if 'fileName' in resource_data:
+        try:
+            bucket_name = 'resources'
+            storage.from_(bucket_name).remove(resource_data['fileName'])
+        except Exception as e:
+            return jsonify({
+                'error': f'Failed to delete file from storage: {str(e)}'
+            }), 500
+    
+    # Delete resource from Firestore
+    try:
+        db.collection('resources').document(resource_id).delete()
+        return jsonify({
+            "message": "Resource and associated file deleted successfully"
+        })
+    except Exception as e:
+        return jsonify({
+            'error': f'Failed to delete resource: {str(e)}'
+        }), 500
 
 
 # Run the Flask app

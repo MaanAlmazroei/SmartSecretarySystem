@@ -26,6 +26,8 @@ const SecResources = () => {
     description: "",
     type: "",
   });
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [editSelectedFile, setEditSelectedFile] = useState(null);
 
   useEffect(() => {
     const fetchResources = async () => {
@@ -84,10 +86,32 @@ const SecResources = () => {
     return acc;
   }, []);
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file);
+  };
+
+  const handleCancel = () => {
+    setShowNewResourceForm(false);
+    setNewResource({ title: "", description: "", type: "" });
+    setSelectedFile(null);
+  };
+
   const handleNewResourceSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await createResource(newResource);
+      // Create FormData object
+      const formData = new FormData();
+      formData.append("title", newResource.title);
+      formData.append("description", newResource.description);
+      formData.append("type", newResource.type);
+
+      // Add file if selected
+      if (selectedFile) {
+        formData.append("file", selectedFile);
+      }
+
+      const response = await createResource(formData);
       if (response.error) {
         throw new Error(response.error);
       }
@@ -96,6 +120,7 @@ const SecResources = () => {
       setResources(updatedResources);
       setShowNewResourceForm(false);
       setNewResource({ title: "", description: "", type: "" });
+      setSelectedFile(null);
     } catch (error) {
       setError(error.message);
     }
@@ -117,10 +142,25 @@ const SecResources = () => {
     }
   };
 
+  const handleEditFileChange = (e) => {
+    const file = e.target.files[0];
+    setEditSelectedFile(file);
+  };
+
   const handleEditResource = async (e) => {
     e.preventDefault();
     try {
-      const response = await updateResource(editingResource.id, editResource);
+      const formData = new FormData();
+      formData.append("title", editResource.title);
+      formData.append("description", editResource.description);
+      formData.append("type", editResource.type);
+
+      // Add file if selected
+      if (editSelectedFile) {
+        formData.append("file", editSelectedFile);
+      }
+
+      const response = await updateResource(editingResource.id, formData);
       if (response.error) {
         throw new Error(response.error);
       }
@@ -129,9 +169,16 @@ const SecResources = () => {
       setResources(updatedResources);
       setEditingResource(null);
       setEditResource({ title: "", description: "", type: "" });
+      setEditSelectedFile(null);
     } catch (error) {
       setError(error.message);
     }
+  };
+
+  const handleEditCancel = () => {
+    setEditingResource(null);
+    setEditResource({ title: "", description: "", type: "" });
+    setEditSelectedFile(null);
   };
 
   const startEditing = (resource, category) => {
@@ -231,11 +278,13 @@ const SecResources = () => {
                 required
               />
             </div>
+            <div className="sec-resources-formGroup">
+              <label htmlFor="file">File (Optional)</label>
+              <input type="file" id="file" onChange={handleFileChange} />
+              {selectedFile && <p>Selected file: {selectedFile.name}</p>}
+            </div>
             <div className="sec-resources-formActions">
-              <button
-                type="button"
-                onClick={() => setShowNewResourceForm(false)}
-              >
+              <button type="button" onClick={handleCancel}>
                 Cancel
               </button>
               <button type="submit">Create Resource</button>
@@ -286,8 +335,22 @@ const SecResources = () => {
                 required
               />
             </div>
+            <div className="sec-resources-formGroup">
+              <label htmlFor="edit-file">File (Optional)</label>
+              <input
+                type="file"
+                id="edit-file"
+                onChange={handleEditFileChange}
+              />
+              {editSelectedFile && (
+                <p>Selected file: {editSelectedFile.name}</p>
+              )}
+              {editingResource.fileName && !editSelectedFile && (
+                <p>Current file: {editingResource.fileName}</p>
+              )}
+            </div>
             <div className="sec-resources-formActions">
-              <button type="button" onClick={() => setEditingResource(null)}>
+              <button type="button" onClick={handleEditCancel}>
                 Cancel
               </button>
               <button type="submit">Update Resource</button>
