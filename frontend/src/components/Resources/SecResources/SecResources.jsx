@@ -68,6 +68,8 @@ const SecResources = () => {
         id: resource.id,
         createdAt: resource.createdAt,
         lastUpdatedDate: resource.lastUpdatedDate,
+        fileUrl: resource.fileUrl,
+        fileName: resource.fileName,
       });
     } else {
       acc.push({
@@ -79,6 +81,8 @@ const SecResources = () => {
             id: resource.id,
             createdAt: resource.createdAt,
             lastUpdatedDate: resource.lastUpdatedDate,
+            fileUrl: resource.fileUrl,
+            fileName: resource.fileName,
           },
         ],
       });
@@ -182,6 +186,7 @@ const SecResources = () => {
   };
 
   const startEditing = (resource, category) => {
+    setShowNewResourceForm(false);
     setEditingResource(resource);
     setEditResource({
       title: resource.title,
@@ -197,7 +202,10 @@ const SecResources = () => {
           <h1 className="sec-resources-heading">Secretary Resources</h1>
           <button
             className="sec-resources-newResourceBtn"
-            onClick={() => setShowNewResourceForm(true)}
+            onClick={() => {
+              setEditingResource(null);
+              setShowNewResourceForm(true);
+            }}
           >
             + New Resource
           </button>
@@ -214,7 +222,10 @@ const SecResources = () => {
           <h1 className="sec-resources-heading">Secretary Resources</h1>
           <button
             className="sec-resources-newResourceBtn"
-            onClick={() => setShowNewResourceForm(true)}
+            onClick={() => {
+              setEditingResource(null);
+              setShowNewResourceForm(true);
+            }}
           >
             + New Resource
           </button>
@@ -230,7 +241,10 @@ const SecResources = () => {
         <h1 className="sec-resources-heading">Secretary Resources</h1>
         <button
           className="sec-resources-newResourceBtn"
-          onClick={() => setShowNewResourceForm(true)}
+          onClick={() => {
+            setEditingResource(null);
+            setShowNewResourceForm(true);
+          }}
         >
           + New Resource
         </button>
@@ -342,11 +356,17 @@ const SecResources = () => {
                 id="edit-file"
                 onChange={handleEditFileChange}
               />
-              {editSelectedFile && (
-                <p>Selected file: {editSelectedFile.name}</p>
-              )}
-              {editingResource.fileName && !editSelectedFile && (
-                <p>Current file: {editingResource.fileName}</p>
+              {editingResource.fileUrl && (
+                <div className="sec-resources-currentFile">
+                  <p>Current file: {editingResource.fileName}</p>
+                  <a
+                    href={editingResource.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Download Current File
+                  </a>
+                </div>
               )}
             </div>
             <div className="sec-resources-formActions">

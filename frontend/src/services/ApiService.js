@@ -239,18 +239,7 @@ export const getAllResources = async () => {
   return response.json();
 };
 
-export const updateResource = async (resourceId, resourceData) => {
-  const formData = new FormData();
-
-  Object.keys(resourceData).forEach((key) => {
-    if (key === "file") {
-      formData.append("file", resourceData[key]);
-    } else {
-      formData.append(key, resourceData[key]);
-    }
-  });
-
-  // Add resourceId to formData
+export const updateResource = async (resourceId, formData) => {
   formData.append("resourceId", resourceId);
 
   const response = await fetch(`${API_BASE_URL}/update_resource`, {

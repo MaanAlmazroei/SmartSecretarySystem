@@ -259,3 +259,19 @@
 .sec-resources-formActions button:hover {
   opacity: 0.9;
 }
+
+.sec-resources-currentFile {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.sec-resources-currentFile a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.sec-resources-currentFile a:hover {
+  text-decoration: underline;
+}
