@@ -9,6 +9,7 @@ import Home from "./components/Home/Home.jsx";
 import Layout from "./components/Layout/Layout.jsx";
 import SignUp from "./components/SignUp/SignUp.jsx";
 import Login from "./components/Login/Login.jsx";
+import ForgotPassword from "./components/ForgotPassword/ForgotPassword.jsx";
 import NoSecResources from "./components/Resources/NoSecResources/NoSecResources.jsx";
 import SecResources from "./components/Resources/SecResources/SecResources.jsx";
 import Profile from "./components/Profile/Profile.jsx";
@@ -53,6 +54,7 @@ function AppRoutes() {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
+      <Route path="/ForgotPassword" element={<ForgotPassword />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/login" element={<Login />} />
       <Route
