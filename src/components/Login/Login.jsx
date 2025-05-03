@@ -111,7 +111,8 @@ function Login() {
                 </Link>
               </div>
 
-              <button type="submit" className="Login-submitButton">
+              <button type="submit" className="Login-submitButton" data-testid="login-button" // data test id is used for testing
+              > 
                 Log In
               </button>
 
