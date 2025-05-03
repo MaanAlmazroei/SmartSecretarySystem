@@ -192,6 +192,7 @@ const SignUp = () => {
                 <input
                   type="password"
                   id="password"
+                  data-testid="password"
                   value={formData.password}
                   onChange={handleChange}
                   className={`signUp-input ${
@@ -227,6 +228,7 @@ const SignUp = () => {
                 <input
                   type="password"
                   id="confirmPassword"
+                  data-testid="confirm-password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className={`signUp-input ${
@@ -241,7 +243,7 @@ const SignUp = () => {
                 )}
               </div>
 
-              <button type="submit" className="signUp-submitButton">
+              <button type="submit" className="signUp-submitButton" data-testid="sign-up-button">
                 Sign Up
               </button>
             </form>
