@@ -201,6 +201,16 @@ export const deleteAppointment = async (appointmentId) => {
   return response.json();
 };
 
+export const checkTimeSlotAvailability = async (date, time) => {
+  const response = await fetch(
+    `${API_BASE_URL}/check_time_slot_availability?date=${date}&time=${time}`,
+    {
+      credentials: "include",
+    }
+  );
+  return response.json();
+};
+
 // Resource related API calls
 export const createResource = async (formData) => {
   const response = await fetch(`${API_BASE_URL}/create_resource`, {

@@ -4,6 +4,7 @@ import {
   createAppointment,
   getUserAllAppointments,
   checkAuth,
+  checkTimeSlotAvailability,
 } from "../../../services/ApiService";
 import { useAuth } from "../../../Context/AuthContext";
 
@@ -45,6 +46,7 @@ const UserAppointments = () => {
   const [appointmentsList, setAppointmentsList] = useState([]);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
   const { user } = useAuth();
+  const [bookedTimeSlots, setBookedTimeSlots] = useState({});
 
   const fetchAppointments = async () => {
     if (user?.uid) {
@@ -110,7 +112,83 @@ const UserAppointments = () => {
     }));
   };
 
-  const handleTimeSelect = (time) => {
+  const checkAvailability = async (date, time) => {
+    try {
+      const response = await checkTimeSlotAvailability(date, time);
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      return response.isAvailable;
+    } catch (error) {
+      console.error("Error checking time slot availability:", error.message);
+      return false;
+    }
+  };
+
+  const getMinDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const isTimeSlotInPast = (date, time) => {
+    if (!date || !time) return false;
+
+    const today = new Date();
+    const appointmentDate = new Date(date);
+
+    // If the appointment is not today, it's not in the past
+    if (
+      appointmentDate.getDate() !== today.getDate() ||
+      appointmentDate.getMonth() !== today.getMonth() ||
+      appointmentDate.getFullYear() !== today.getFullYear()
+    ) {
+      return false;
+    }
+
+    // For today's date, check if the time slot is in the past
+    const [hours, minutes] = time.split(":");
+    const [timeValue, period] = minutes.split(" ");
+    const hour =
+      period === "PM" && hours !== "12"
+        ? parseInt(hours) + 12
+        : parseInt(hours);
+    const minute = parseInt(timeValue);
+
+    const currentHour = today.getHours();
+    const currentMinute = today.getMinutes();
+
+    return (
+      hour < currentHour || (hour === currentHour && minute < currentMinute)
+    );
+  };
+
+  const handleDateChange = async (e) => {
+    const date = e.target.value;
+    setAppointment((prev) => ({ ...prev, appointmentDate: date }));
+
+    // Reset time slot selection when date changes
+    setAppointment((prev) => ({ ...prev, appointmentTime: "" }));
+
+    // Check availability for all time slots for the selected date
+    const availabilityPromises = timeSlots.map((time) =>
+      checkAvailability(date, time)
+    );
+
+    const availabilities = await Promise.all(availabilityPromises);
+    const bookedSlots = {};
+    timeSlots.forEach((time, index) => {
+      bookedSlots[time] =
+        !availabilities[index] || isTimeSlotInPast(date, time);
+    });
+    setBookedTimeSlots(bookedSlots);
+  };
+
+  const handleTimeSelect = async (time) => {
+    if (bookedTimeSlots[time]) return;
+
     setAppointment((prev) => ({
       ...prev,
       appointmentTime: time,
@@ -138,7 +216,8 @@ const UserAppointments = () => {
       });
 
       if (response.error) {
-        throw new Error(response.error);
+        setErrors({ ...errors, timeSlot: response.error });
+        return;
       }
 
       await fetchAppointments();
@@ -154,6 +233,7 @@ const UserAppointments = () => {
     if (selected) {
       setAppointment(selected);
       setSelectedAppointmentId(id);
+      setBookedTimeSlots({});
     }
   };
 
@@ -161,6 +241,7 @@ const UserAppointments = () => {
     setAppointment({ ...initialAppointmentState });
     setSelectedAppointmentId(null);
     setErrors({});
+    setBookedTimeSlots({});
   };
 
   const formatDate = (dateString) => {
@@ -206,6 +287,7 @@ const UserAppointments = () => {
               onClick={() => {
                 setAppointment({ ...initialAppointmentState });
                 setSelectedAppointmentId(null);
+                setBookedTimeSlots({});
               }}
             >
               <span>+</span> New Appointment
@@ -214,7 +296,9 @@ const UserAppointments = () => {
 
           {appointmentsList.length === 0 ? (
             <div className="UserAppointments-no-appointments">
-              <p>No appointments found. Create a new appointment to get started.</p>
+              <p>
+                No appointments found. Create a new appointment to get started.
+              </p>
             </div>
           ) : (
             <div className="UserAppointments-list">
@@ -222,14 +306,18 @@ const UserAppointments = () => {
                 <div
                   key={a.id}
                   className={`UserAppointments-item ${
-                    selectedAppointmentId === a.id ? "UserAppointments-selected" : ""
+                    selectedAppointmentId === a.id
+                      ? "UserAppointments-selected"
+                      : ""
                   }`}
                   onClick={() => selectAppointment(a.id)}
                 >
                   <div className="UserAppointments-item-header">
                     <h3>{a.title}</h3>
                     <span
-                      className={`UserAppointments-status ${getStatusClass(a.status)}`}
+                      className={`UserAppointments-status ${getStatusClass(
+                        a.status
+                      )}`}
                     >
                       {a.status}
                     </span>
@@ -256,7 +344,9 @@ const UserAppointments = () => {
               <div className="UserAppointments-detail-header">
                 <h2>{appointment.title}</h2>
                 <span
-                  className={`UserAppointments-status ${getStatusClass(appointment.status)}`}
+                  className={`UserAppointments-status ${getStatusClass(
+                    appointment.status
+                  )}`}
                 >
                   {appointment.status}
                 </span>
@@ -266,7 +356,8 @@ const UserAppointments = () => {
                 <div className="UserAppointments-metadata-item">
                   <span className="UserAppointments-label">Scheduled for:</span>
                   <span>
-                    {appointment.appointmentDate} at {appointment.appointmentTime}
+                    {appointment.appointmentDate} at{" "}
+                    {appointment.appointmentTime}
                   </span>
                 </div>
                 <div className="UserAppointments-metadata-item">
@@ -275,7 +366,9 @@ const UserAppointments = () => {
                 </div>
                 {appointment.createdAt !== appointment.lastUpdatedDate && (
                   <div className="UserAppointments-metadata-item">
-                    <span className="UserAppointments-label">Last updated:</span>
+                    <span className="UserAppointments-label">
+                      Last updated:
+                    </span>
                     <span>{formatDate(appointment.lastUpdatedDate)}</span>
                   </div>
                 )}
@@ -307,10 +400,14 @@ const UserAppointments = () => {
                   name="title"
                   value={appointment.title}
                   onChange={handleInputChange}
-                  className={`UserAppointments-form-control ${errors.title ? "UserAppointments-error" : ""}`}
+                  className={`UserAppointments-form-control ${
+                    errors.title ? "UserAppointments-error" : ""
+                  }`}
                 />
                 {errors.title && (
-                  <span className="UserAppointments-error-message">{errors.title}</span>
+                  <span className="UserAppointments-error-message">
+                    {errors.title}
+                  </span>
                 )}
               </div>
 
@@ -321,7 +418,8 @@ const UserAppointments = () => {
                   id="appointmentDate"
                   name="appointmentDate"
                   value={appointment.appointmentDate}
-                  onChange={handleInputChange}
+                  onChange={handleDateChange}
+                  min={getMinDate()}
                   className={`UserAppointments-form-control ${
                     errors.appointmentDate ? "UserAppointments-error" : ""
                   }`}
@@ -336,21 +434,47 @@ const UserAppointments = () => {
               <div className="UserAppointments-form-group">
                 <label>Time Slot *</label>
                 <div className="UserAppointments-time-slots-container">
-                  {timeSlots.map((time) => (
-                    <div
-                      key={time}
-                      className={`UserAppointments-time-slot ${
-                        appointment.appointmentTime === time ? "UserAppointments-selected" : ""
-                      }`}
-                      onClick={() => handleTimeSelect(time)}
-                    >
-                      {time}
-                    </div>
-                  ))}
+                  {timeSlots.map((time) => {
+                    const isBooked = bookedTimeSlots[time] || false;
+                    const isPast = isTimeSlotInPast(
+                      appointment.appointmentDate,
+                      time
+                    );
+                    return (
+                      <div
+                        key={time}
+                        className={`UserAppointments-time-slot ${
+                          appointment.appointmentTime === time
+                            ? "UserAppointments-selected"
+                            : ""
+                        } ${isBooked ? "UserAppointments-booked" : ""}`}
+                        onClick={() => handleTimeSelect(time)}
+                        title={
+                          isBooked
+                            ? isPast
+                              ? "This time slot has already passed"
+                              : "This time slot is already booked"
+                            : ""
+                        }
+                      >
+                        {time}
+                        {isBooked && (
+                          <span className="UserAppointments-booked-badge">
+                            {isPast ? "Passed" : "Booked"}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
                 {errors.appointmentTime && (
                   <span className="UserAppointments-error-message">
                     {errors.appointmentTime}
+                  </span>
+                )}
+                {errors.timeSlot && (
+                  <span className="UserAppointments-error-message">
+                    {errors.timeSlot}
                   </span>
                 )}
               </div>
@@ -368,7 +492,9 @@ const UserAppointments = () => {
                   rows="5"
                 />
                 {errors.description && (
-                  <span className="UserAppointments-error-message">{errors.description}</span>
+                  <span className="UserAppointments-error-message">
+                    {errors.description}
+                  </span>
                 )}
               </div>
 

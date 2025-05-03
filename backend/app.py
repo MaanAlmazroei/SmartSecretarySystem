@@ -5,7 +5,7 @@ from supabase_config import storage
 import functools
 from flask_cors import CORS
 import secrets
-from datetime import timedelta
+from datetime import timedelta, datetime
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -439,6 +439,26 @@ def delete_ticket():
 
 # ===== APPOINTMENTS CRUD =====
 
+# Allowed time slots for appointments
+ALLOWED_TIME_SLOTS = [
+    "09:00 AM",
+    "09:30 AM",
+    "10:00 AM",
+    "10:30 AM",
+    "11:00 AM",
+    "11:30 AM",
+    "12:00 PM",
+    "12:30 PM",
+    "01:00 PM",
+    "01:30 PM",
+    "02:00 PM",
+    "02:30 PM",
+    "03:00 PM",
+    "03:30 PM",
+    "04:00 PM",
+    "04:30 PM",
+]
+
 @app.route('/create_appointment', methods=['POST'])
 @require_auth
 def create_appointment():
@@ -449,6 +469,32 @@ def create_appointment():
     for field in required_fields:
         if field not in data:
             return jsonify({'error': f'Missing required field: {field}'}), 400
+    
+    # Validate appointment date and time
+    try:
+        appointment_date = datetime.strptime(data['appointmentDate'], '%Y-%m-%d').date()
+        current_date = datetime.now().date()
+        
+        if appointment_date < current_date:
+            return jsonify({'error': 'Cannot book appointments in the past. Please select a future date.'}), 400
+        elif appointment_date == current_date:
+            # For today's date, check if the time slot is in the past
+            current_time = datetime.now().time()
+            appointment_time = datetime.strptime(data['appointmentTime'], '%I:%M %p').time()
+            if appointment_time < current_time:
+                return jsonify({'error': 'Cannot book appointments in past time slots. Please select a future time.'}), 400
+    except ValueError:
+        return jsonify({'error': 'Invalid date or time format'}), 400
+    
+    # Validate appointment time is in allowed slots
+    if data['appointmentTime'] not in ALLOWED_TIME_SLOTS:
+        return jsonify({'error': 'Invalid time slot. Please select a valid time slot.'}), 400
+    
+    # Check if there's already an appointment at this date and time
+    existing_appointments = db.collection('appointments').where('appointmentDate', '==', data['appointmentDate']).where('appointmentTime', '==', data['appointmentTime']).get()
+    
+    if len(existing_appointments) > 0:
+        return jsonify({'error': 'This time slot is already booked. Please choose a different time.'}), 400
     
     # Extract validated appointment data fields
     appointment_data = {
@@ -591,6 +637,42 @@ def delete_appointment():
     
     db.collection('appointments').document(appointment_id).delete()
     return jsonify({"message": "Appointment deleted successfully"})
+
+
+@app.route('/check_time_slot_availability', methods=['GET'])
+@require_auth
+def check_time_slot_availability():
+    date = request.args.get('date')
+    time = request.args.get('time')
+    
+    if not date or not time:
+        return jsonify({'error': 'Date and time are required'}), 400
+    
+    # Validate date and time
+    try:
+        appointment_date = datetime.strptime(date, '%Y-%m-%d').date()
+        current_date = datetime.now().date()
+        
+        if appointment_date < current_date:
+            return jsonify({'error': 'Cannot check availability for past dates', 'isAvailable': False}), 400
+        elif appointment_date == current_date:
+            # For today's date, check if the time slot is in the past
+            current_time = datetime.now().time()
+            appointment_time = datetime.strptime(time, '%I:%M %p').time()
+            if appointment_time < current_time:
+                return jsonify({'error': 'Cannot check availability for past time slots', 'isAvailable': False}), 400
+    except ValueError:
+        return jsonify({'error': 'Invalid date or time format', 'isAvailable': False}), 400
+    
+    # Validate time is in allowed slots
+    if time not in ALLOWED_TIME_SLOTS:
+        return jsonify({'error': 'Invalid time slot', 'isAvailable': False}), 400
+    
+    # Check if there's already an appointment at this date and time
+    existing_appointments = db.collection('appointments').where('appointmentDate', '==', date).where('appointmentTime', '==', time).get()
+    
+    is_available = len(existing_appointments) == 0
+    return jsonify({'isAvailable': is_available})
 
 
 # ===== RESOURCES CRUD =====
