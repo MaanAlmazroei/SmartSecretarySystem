@@ -1,70 +1,72 @@
-# Getting Started with Create React App
+# FCIT KAU IT Secretary System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A specialized web application designed for the Faculty of Computing and Information Technology (FCIT) at King Abdulaziz University (KAU). This system streamlines the process of managing IT support services, allowing students to book appointments, create support tickets, and access IT resources, while enabling IT secretaries to efficiently manage these requests.
 
-## Available Scripts
+## System Overview
 
-In the project directory, you can run:
+The FCIT KAU IT Secretary System serves as a centralized platform for managing IT support services within the faculty. It provides three main functionalities:
 
-### `npm start`
+### 1. Appointment Management
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Students can book appointments with IT secretaries for technical support
+- Real-time availability checking prevents double bookings
+- Smart validation prevents booking past dates and time slots
+- Students can track their appointment status (In Progress, Approved, Rejected)
+- IT secretaries can manage and update all appointments
+- IT secretaries can provide feedback on appointments
+- Students can view secretary's feedback on their appointments
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 2. Support Tickets
 
-### `npm test`
+- Students can create tickets for IT-related issues
+- Each ticket includes a title, description, and status tracking
+- Students can monitor their ticket status (In Progress, Resolved)
+- IT secretaries can provide feedback on resolved tickets
+- Students can view secretary's feedback on their tickets
+- IT secretaries can efficiently manage and update tickets
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 3. IT Resources
 
-### `npm run build`
+- Centralized repository for IT-related resources and documentation
+- IT secretaries can upload and organize resources
+- Students can access relevant IT documentation and guides
+- Resources are categorized for easy navigation
+- Access control ensures proper management of resources
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## User Roles
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Students
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- Can book IT support appointments
+- Can create and track support tickets
+- Can access IT resources and documentation
+- Can view their own appointments and tickets
+- Can view secretary's feedback on their appointments and tickets
 
-### `npm run eject`
+### IT Secretaries
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- Can manage all appointments
+- Can update appointment statuses
+- Can provide feedback on appointments and tickets
+- Can manage and resolve support tickets
+- Can upload and manage IT resources
+- Have full access to system management
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Security and Privacy
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- Role-based access control ensures proper separation of duties
+- Students can only access their own appointments and tickets
+- IT secretaries have appropriate access levels for their responsibilities
+- All data is securely stored and managed
+- Authentication ensures only authorized users can access the system
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Technical Implementation
 
-## Learn More
+The system is built using modern web technologies:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- Frontend: React.js with responsive design
+- Backend: Flask (Python) for robust API handling
+- Database: Firebase Firestore for secure data storage
+- File Storage: Supabase for resource management
+- Authentication: Firebase Authentication for secure access
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

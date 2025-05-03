@@ -5,18 +5,18 @@ import {
   Navigate,
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import Home from "./components/Home/Home";
-import Layout from "./components/Layout/Layout";
-import SignUp from "./components/SignUp/SignUp";
-import Login from "./components/Login/Login";
+import Home from "./components/Home/Home.jsx";
+import Layout from "./components/Layout/Layout.jsx";
+import SignUp from "./components/SignUp/SignUp.jsx";
+import Login from "./components/Login/Login.jsx";
 import NoSecResources from "./components/Resources/NoSecResources/NoSecResources.jsx";
 import SecResources from "./components/Resources/SecResources/SecResources.jsx";
-import Profile from "./components/Profile/Profile";
+import Profile from "./components/Profile/Profile.jsx";
 import UserTickets from "./components/Tickets/UserTickets/UserTickets.jsx";
 import SecretaryTickets from "./components/Tickets/SecretaryTickets/SecretaryTickets.jsx";
 import UserAppointments from "./components/Appointments/UserAppointments/UserAppointments.jsx";
 import SecretaryAppointments from "./components/Appointments/SecretaryAppointments/SecretaryAppointments.jsx";
-import { useAuth } from "./Context/AuthContext";
+import { useAuth } from "./Context/AuthContext.jsx";
 
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { user, loading } = useAuth();
