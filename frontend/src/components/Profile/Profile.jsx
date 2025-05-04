@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
 import { getUser, updateUser } from "../../services/ApiService";
@@ -31,36 +31,35 @@ const Profile = () => {
     }
   }, [location]);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        if (!user) {
-          throw new Error("No user logged in");
-        }
-
-        // Get user data from our API
-        const response = await getUser(user.uid);
-        if (response.error) {
-          throw new Error(response.error);
-        }
-
-        setUserData({
-          firstName: response.firstName || "",
-          lastName: response.lastName || "",
-          email: user.email || "",
-          phone: response.phone || "",
-          password: "",
-        });
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        setError(error.message);
-        setLoading(false);
+  const fetchUserData = useCallback(async () => {
+    try {
+      if (!user) {
+        throw new Error("No user logged in");
       }
-    };
 
-    fetchUserData();
+      const response = await getUser(user.uid);
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
+      setUserData({
+        firstName: response.firstName || "",
+        lastName: response.lastName || "",
+        email: user.email || "",
+        phone: response.phone || "",
+        password: "",
+      });
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setError(error.message);
+      setLoading(false);
+    }
   }, [user]);
+
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

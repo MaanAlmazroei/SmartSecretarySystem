@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./UserTickets.css";
 import { getUserAllTickets, createTicket } from "../../../services/ApiService";
 import { useAuth } from "../../../Context/AuthContext";
@@ -19,7 +19,7 @@ const UserTickets = () => {
   const [selectedTicketId, setSelectedTicketId] = useState(null);
   const { user } = useAuth();
 
-  const fetchTickets = async () => {
+  const fetchTickets = useCallback(async () => {
     if (user?.uid) {
       try {
         const response = await getUserAllTickets(user.uid);
@@ -33,11 +33,11 @@ const UserTickets = () => {
     } else {
       setTicketsList([]);
     }
-  };
+  }, [user?.uid]);
 
   useEffect(() => {
     fetchTickets();
-  }, [user?.uid]);
+  }, [fetchTickets]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -169,7 +169,9 @@ const UserTickets = () => {
                   <div className="UserTickets-item-header">
                     <h3>{t.title}</h3>
                     <span
-                      className={`UserTickets-status ${getStatusClass(t.status)}`}
+                      className={`UserTickets-status ${getStatusClass(
+                        t.status
+                      )}`}
                     >
                       {t.status}
                     </span>
@@ -196,7 +198,9 @@ const UserTickets = () => {
               <div className="UserTickets-detail-header">
                 <h2>{ticket.title}</h2>
                 <span
-                  className={`UserTickets-status ${getStatusClass(ticket.status)}`}
+                  className={`UserTickets-status ${getStatusClass(
+                    ticket.status
+                  )}`}
                 >
                   {ticket.status}
                 </span>
@@ -241,10 +245,14 @@ const UserTickets = () => {
                   name="title"
                   value={ticket.title}
                   onChange={handleInputChange}
-                  className={`UserTickets-form-control ${errors.title ? "UserTickets-error" : ""}`}
+                  className={`UserTickets-form-control ${
+                    errors.title ? "UserTickets-error" : ""
+                  }`}
                 />
                 {errors.title && (
-                  <span className="UserTickets-error-message">{errors.title}</span>
+                  <span className="UserTickets-error-message">
+                    {errors.title}
+                  </span>
                 )}
               </div>
 
@@ -261,7 +269,9 @@ const UserTickets = () => {
                   rows="5"
                 />
                 {errors.description && (
-                  <span className="UserTickets-error-message">{errors.description}</span>
+                  <span className="UserTickets-error-message">
+                    {errors.description}
+                  </span>
                 )}
               </div>
 
