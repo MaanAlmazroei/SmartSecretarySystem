@@ -57,7 +57,13 @@ function Login() {
           throw new Error("Login failed");
         }
       } catch (error) {
-        toast.error("Failed to login");
+        if (error.message.includes("Email not verified")) {
+          toast.error(
+            "Please verify your email before logging in. Check your inbox for the verification link."
+          );
+        } else {
+          toast.error(error.message || "Failed to login");
+        }
       }
     }
   };

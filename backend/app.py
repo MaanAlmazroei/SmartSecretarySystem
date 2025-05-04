@@ -66,6 +66,128 @@ def require_secretary_role(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# Firebase API Helpers
+def get_firebase_api_url(endpoint):
+    return f'https://identitytoolkit.googleapis.com/v1/accounts:{endpoint}?key={os.environ.get("FIREBASE_API_KEY")}'
+
+def make_firebase_request(endpoint, payload):
+    url = get_firebase_api_url(endpoint)
+    response = requests.post(url, json=payload)
+    result = response.json()
+    if 'error' in result:
+        raise Exception(result['error']['message'])
+    return result
+
+def send_verification_email(id_token):
+    try:
+        payload = {
+            "requestType": "VERIFY_EMAIL",
+            "idToken": id_token
+        }
+        make_firebase_request('sendOobCode', payload)
+        return True
+    except Exception as e:
+        print(f"Error sending verification email: {str(e)}")
+        return False
+
+def verify_email_with_code(oob_code):
+    payload = {
+        "oobCode": oob_code
+    }
+    return make_firebase_request('update', payload)
+
+# User Helpers
+def get_user_role(user_id):
+    user_doc = db.collection('users').document(user_id).get()
+    return user_doc.to_dict().get('role', 'user') if user_doc.exists else 'user'
+
+def check_user_permission(current_user_id, target_user_id, required_role='secretary'):
+    if current_user_id == target_user_id:
+        return True
+    return get_user_role(current_user_id) == required_role
+
+# Email Verification Endpoints
+@app.route('/send_verification_email', methods=['POST'])
+def send_verification_email_endpoint():
+    data = request.get_json()
+    email = data.get('email')
+    
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+    
+    try:
+        user = auth.get_user_by_email(email)
+        send_verification_email(user.uid)
+        return jsonify({"message": "Verification email sent successfully"})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/verify_email', methods=['POST'])
+def verify_email_endpoint():
+    data = request.get_json()
+    oob_code = data.get('oobCode')
+    
+    if not oob_code:
+        return jsonify({'error': 'Verification code is required'}), 400
+    
+    try:
+        verify_email_with_code(oob_code)
+        return jsonify({"message": "Email verified successfully"})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# User Creation
+@app.route('/create_user', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    
+    # Validate required fields
+    required_fields = ['email', 'password', 'firstName', 'lastName', 'phone']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'error': f'Missing required field: {field}'}), 400
+    
+    try:
+        # Sign up user and get ID token
+        signup_payload = {
+            "email": data['email'],
+            "password": data['password'],
+            "returnSecureToken": True
+        }
+        signup_result = make_firebase_request('signUp', signup_payload)
+        
+        id_token = signup_result.get('idToken')
+        uid = signup_result.get('localId')
+        
+        if not id_token or not uid:
+            return jsonify({'error': 'Failed to create user account'}), 500
+
+        # Store user data in Firestore
+        user_data = {
+            'firstName': data['firstName'],
+            'lastName': data['lastName'],
+            'phone': data['phone'],
+            'role': 'user',
+            'createdAt': firestore.SERVER_TIMESTAMP,
+            'lastUpdatedDate': firestore.SERVER_TIMESTAMP,
+        }
+        db.collection('users').document(uid).set(user_data)
+        
+        # Send verification email
+        send_verification_email(id_token)
+        
+        return jsonify({
+            "message": "User created successfully. Please check your email to verify your account before logging in.",
+            "userId": uid,
+            "email": data['email'],
+            "role": "user",
+            "emailVerified": False
+        }), 201
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Login
 @app.route('/login', methods=['POST', 'OPTIONS'])
 def login():
     if request.method == 'OPTIONS':
@@ -79,28 +201,27 @@ def login():
         return jsonify({'error': 'Email and password are required'}), 400
 
     try:
-        # Step 1: Verify email/password using Firebase REST API
-        url = f'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={os.environ.get("FIREBASE_API_KEY")}'
-        payload = {
+        # Sign in user
+        signin_payload = {
             "email": email,
             "password": password,
             "returnSecureToken": True
         }
+        result = make_firebase_request('signInWithPassword', signin_payload)
 
-        response = requests.post(url, json=payload)
-        result = response.json()
-
-        if 'error' in result:
-            return jsonify({'error': result['error']['message']}), 401
+        # Check if email is verified
+        user = auth.get_user_by_email(email)
+        if not user.email_verified:
+            return jsonify({'error': 'Email not verified. Please verify your email first.'}), 401
 
         uid = result['localId']
 
-        # Step 2: Set session
+        # Set session
         session.permanent = True
         session['user_id'] = uid
         session['email'] = email
 
-        # Step 3: Fetch user role and details from Firestore
+        # Get user role and details
         user_doc = db.collection('users').document(uid).get()
         if user_doc.exists:
             user_data = user_doc.to_dict()
@@ -117,7 +238,6 @@ def login():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/logout', methods=['POST'])
 def logout():
@@ -165,53 +285,6 @@ def send_ticket_email(user_email, data, documentId, type):
 
 
 # ===== USERS CRUD =====
-
-@app.route('/create_user', methods=['POST'])
-def create_user():
-    data = request.get_json()
-    
-    # Validate required fields
-    required_fields = ['email', 'password', 'firstName', 'lastName', 'phone']
-    for field in required_fields:
-        if field not in data:
-            return jsonify({'error': f'Missing required field: {field}'}), 400
-    
-    try:
-        # Create user in Firebase Auth
-        user_record = auth.create_user(
-            email=data['email'],
-            password=data['password']
-        )
-
-        # Store user data in Firestore
-        user_data = {
-            'firstName': data['firstName'],
-            'lastName': data['lastName'],
-            'phone': data['phone'],
-            'role': 'user',
-            'createdAt': firestore.SERVER_TIMESTAMP,
-            'lastUpdatedDate': firestore.SERVER_TIMESTAMP,
-        }
-        
-        db.collection('users').document(user_record.uid).set(user_data)
-        
-        # Create session for the user
-        session['user_id'] = user_record.uid
-        session['email'] = data['email']
-        session['firstName'] = data['firstName']
-        session['lastName'] = data['lastName']
-        session['role'] = 'user'
-        
-        return jsonify({
-            "message": "User created successfully",
-            "userId": user_record.uid,
-            "email": data['email'],
-            "role": "user"
-        }), 201
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
 
 @app.route('/get_user', methods=['GET'])
 @require_auth
