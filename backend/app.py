@@ -1,5 +1,7 @@
+import os
 from flask import Flask, request, jsonify, session
 from firebase_admin import firestore, auth
+import requests
 from firebase_config import db
 from supabase_config import storage
 import functools
@@ -68,38 +70,54 @@ def require_secretary_role(f):
 def login():
     if request.method == 'OPTIONS':
         return '', 200
-        
+
     data = request.get_json()
-    
-    if 'email' not in data or 'password' not in data:
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
         return jsonify({'error': 'Email and password are required'}), 400
-    
+
     try:
-        # Verify user credentials with Firebase
-        user = auth.get_user_by_email(data['email'])
-        
-        # Set session data
+        # Step 1: Verify email/password using Firebase REST API
+        url = f'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={os.environ.get("FIREBASE_API_KEY")}'
+        payload = {
+            "email": email,
+            "password": password,
+            "returnSecureToken": True
+        }
+
+        response = requests.post(url, json=payload)
+        result = response.json()
+
+        if 'error' in result:
+            return jsonify({'error': result['error']['message']}), 401
+
+        uid = result['localId']
+
+        # Step 2: Set session
         session.permanent = True
-        session['user_id'] = user.uid
-        session['email'] = data['email']
-        
-        # Get user role from Firestore
-        user_doc = db.collection('users').document(user.uid).get()
+        session['user_id'] = uid
+        session['email'] = email
+
+        # Step 3: Fetch user role and details from Firestore
+        user_doc = db.collection('users').document(uid).get()
         if user_doc.exists:
             user_data = user_doc.to_dict()
             session['role'] = user_data.get('role', 'user')
             session['firstName'] = user_data.get('firstName', 'user')
             session['lastName'] = user_data.get('lastName', 'user')
-        
+
         return jsonify({
             "message": "Login successful",
-            "userId": user.uid,
-            "email": data['email'],
-            "role": session['role']
+            "userId": uid,
+            "email": email,
+            "role": session.get('role', 'user')
         })
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 401
+        return jsonify({'error': str(e)}), 500
+
 
 @app.route('/logout', methods=['POST'])
 def logout():

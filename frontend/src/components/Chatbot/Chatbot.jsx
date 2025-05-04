@@ -23,7 +23,7 @@ const Chatbot = () => {
       parts: [{text}]
     }));
 
-    const API_URL = `${process.env.REACT_APP_API_URL}?key=${process.env.REACT_APP_API_KEY}`;
+    const API_URL = `${process.env.REACT_APP_CHATBOT_API_URL}?key=${process.env.REACT_APP_CHATBOT_API_KEY}`;
     console.log("Full API URL:", API_URL);
 
     try {

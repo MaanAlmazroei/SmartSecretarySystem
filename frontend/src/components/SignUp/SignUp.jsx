@@ -97,9 +97,11 @@ const SignUp = () => {
         await authLogin(formData.email, formData.password);
 
         toast.success("Account created successfully!");
-        navigate("/");
+        setTimeout(() => {
+          navigate("/");
+        }, 500);
       } catch (error) {
-        toast.error(error.message || "Failed to create account");
+        toast.error("Failed to create account");
       }
     }
   };
@@ -243,7 +245,11 @@ const SignUp = () => {
                 )}
               </div>
 
-              <button type="submit" className="signUp-submitButton" data-testid="sign-up-button">
+              <button
+                type="submit"
+                className="signUp-submitButton"
+                data-testid="sign-up-button"
+              >
                 Sign Up
               </button>
             </form>

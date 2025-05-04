@@ -139,30 +139,51 @@ const UserAppointments = () => {
     const today = new Date();
     const appointmentDate = new Date(date);
 
-    // If the appointment is not today, it's not in the past
-    if (
-      appointmentDate.getDate() !== today.getDate() ||
-      appointmentDate.getMonth() !== today.getMonth() ||
-      appointmentDate.getFullYear() !== today.getFullYear()
-    ) {
+    // Compare dates first
+    const todayDate = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+    const selectedDate = new Date(
+      appointmentDate.getFullYear(),
+      appointmentDate.getMonth(),
+      appointmentDate.getDate()
+    );
+
+    // If the selected date is before today, all slots are passed
+    if (selectedDate < todayDate) {
+      return true;
+    }
+    // If the selected date is after today, no slots are passed
+    if (selectedDate > todayDate) {
       return false;
     }
 
     // For today's date, check if the time slot is in the past
     const [hours, minutes] = time.split(":");
     const [timeValue, period] = minutes.split(" ");
-    const hour =
-      period === "PM" && hours !== "12"
-        ? parseInt(hours) + 12
-        : parseInt(hours);
-    const minute = parseInt(timeValue);
+    let hour = parseInt(hours);
 
+    // Convert to 24-hour format
+    if (period === "PM" && hour !== 12) {
+      hour += 12;
+    } else if (period === "AM" && hour === 12) {
+      hour = 0;
+    }
+
+    const minute = parseInt(timeValue);
     const currentHour = today.getHours();
     const currentMinute = today.getMinutes();
 
-    return (
-      hour < currentHour || (hour === currentHour && minute < currentMinute)
-    );
+    // Compare hours and minutes
+    if (hour < currentHour) {
+      return true;
+    } else if (hour === currentHour && minute < currentMinute) {
+      return true;
+    }
+
+    return false;
   };
 
   const handleDateChange = async (e) => {

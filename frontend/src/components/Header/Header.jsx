@@ -17,7 +17,7 @@ const Header = () => {
       toast.success("Signed out successfully!");
       setTimeout(() => {
         navigate("/");
-      }, 500);
+      }, 50);
     } catch (error) {
       toast.error("Sign out failed!");
     }
@@ -46,7 +46,9 @@ const Header = () => {
             <li>
               <NavLink
                 to="/"
-                className={({ isActive }) => (isActive ? "Header-nav-active" : "")}
+                className={({ isActive }) =>
+                  isActive ? "Header-nav-active" : ""
+                }
               >
                 Home
               </NavLink>
@@ -54,7 +56,9 @@ const Header = () => {
             <li>
               <NavLink
                 to="/tickets"
-                className={({ isActive }) => (isActive ? "Header-nav-active" : "")}
+                className={({ isActive }) =>
+                  isActive ? "Header-nav-active" : ""
+                }
               >
                 Tickets
               </NavLink>
@@ -62,7 +66,9 @@ const Header = () => {
             <li>
               <NavLink
                 to="/appointments"
-                className={({ isActive }) => (isActive ? "Header-nav-active" : "")}
+                className={({ isActive }) =>
+                  isActive ? "Header-nav-active" : ""
+                }
               >
                 Appointments
               </NavLink>
@@ -70,7 +76,9 @@ const Header = () => {
             <li>
               <NavLink
                 to="/resources"
-                className={({ isActive }) => (isActive ? "Header-nav-active" : "")}
+                className={({ isActive }) =>
+                  isActive ? "Header-nav-active" : ""
+                }
               >
                 Resources
               </NavLink>
@@ -78,7 +86,9 @@ const Header = () => {
             <li>
               <NavLink
                 to="/profile"
-                className={({ isActive }) => (isActive ? "Header-nav-active" : "")}
+                className={({ isActive }) =>
+                  isActive ? "Header-nav-active" : ""
+                }
               >
                 Profile
               </NavLink>

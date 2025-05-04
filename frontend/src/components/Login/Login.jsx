@@ -47,11 +47,17 @@ function Login() {
 
     if (validateForm()) {
       try {
-        authLogin(formData.email, formData.password);
-        toast.success("Logged in successfully!");
-        navigate("/");
+        const response = await authLogin(formData.email, formData.password);
+        if (response && response.userId) {
+          toast.success("Logged in successfully!");
+          setTimeout(() => {
+            navigate("/");
+          }, 500);
+        } else {
+          throw new Error("Login failed");
+        }
       } catch (error) {
-        toast.error(error.message || "Failed to login");
+        toast.error("Failed to login");
       }
     }
   };
@@ -111,8 +117,11 @@ function Login() {
                 </Link>
               </div>
 
-              <button type="submit" className="Login-submitButton" data-testid="login-button" // data test id is used for testing
-              > 
+              <button
+                type="submit"
+                className="Login-submitButton"
+                data-testid="login-button"
+              >
                 Log In
               </button>
 
