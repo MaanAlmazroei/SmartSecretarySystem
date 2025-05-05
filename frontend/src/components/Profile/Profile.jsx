@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
 import { getUser, updateUser } from "../../services/ApiService";
 import "./Profile.css";
