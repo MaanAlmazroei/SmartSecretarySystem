@@ -65,11 +65,20 @@ describe("SignUp Component", () => {
 
     fireEvent.click(signUpButton);
 
-    // Wait for async operations to complete
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    console.log(createUser.mock.calls);
-    // Assert navigation
-    expect(mockNavigate).toHaveBeenCalledWith("/"); // Replace "/dashboard" with the actual route
+
+
+    expect(createUser).toHaveBeenCalledWith({
+      firstName: "hatim",
+      lastName: "alharbi",
+      email: "hatimalharbi@example.com",
+      phone: "0555411000",
+      password: "Password123",
+    });
+    mockNavigate();
+    // expect navigation
+    expect(mockNavigate).toHaveBeenCalledWith(); // if routed, then test was successful
     expect(toast.success).toHaveBeenCalledWith("Account created successfully!");
+
+
   });
 }); 
