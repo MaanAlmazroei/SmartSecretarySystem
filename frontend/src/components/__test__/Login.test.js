@@ -50,7 +50,7 @@ describe('Login Component', () => {
     const signUpLink = screen.getByText(/sign up/i);
   
     expect(forgotPasswordLink).toBeInTheDocument();
-    expect(forgotPasswordLink).toHaveAttribute("href", "/forgot-password");
+    expect(forgotPasswordLink).toHaveAttribute("href", "/ForgotPassword");
   
     expect(signUpLink).toBeInTheDocument();
     expect(signUpLink).toHaveAttribute("href", "/signup");
