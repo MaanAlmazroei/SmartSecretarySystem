@@ -4,11 +4,9 @@ import "./SignUp.css";
 import { createUser } from "../../services/ApiService";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { useAuth } from "../../Context/AuthContext";
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const { login: authLogin } = useAuth();
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -93,15 +91,14 @@ const SignUp = () => {
           throw new Error(response.error);
         }
 
-        // Automatically log in the user after successful signup
-        await authLogin(formData.email, formData.password);
-
-        toast.success("Account created successfully!");
+        toast.success(
+          "Account created successfully! Please check your email to verify your account before logging in."
+        );
         setTimeout(() => {
-          navigate("/");
+          navigate("/login");
         }, 500);
       } catch (error) {
-        toast.error("Failed to create account");
+        toast.error(error.message || "Failed to create account");
       }
     }
   };

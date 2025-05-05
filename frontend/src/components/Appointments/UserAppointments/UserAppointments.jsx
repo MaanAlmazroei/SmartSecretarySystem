@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./UserAppointments.css";
 import {
   createAppointment,
@@ -48,7 +48,7 @@ const UserAppointments = () => {
   const { user } = useAuth();
   const [bookedTimeSlots, setBookedTimeSlots] = useState({});
 
-  const fetchAppointments = async () => {
+  const fetchAppointments = useCallback(async () => {
     if (user?.uid) {
       try {
         const response = await getUserAllAppointments(user.uid);
@@ -62,11 +62,11 @@ const UserAppointments = () => {
     } else {
       setAppointmentsList([]);
     }
-  };
+  }, [user?.uid]);
 
   useEffect(() => {
     fetchAppointments();
-  }, [user?.uid]);
+  }, [fetchAppointments]);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -127,6 +127,7 @@ const UserAppointments = () => {
 
   const getMinDate = () => {
     const today = new Date();
+    today.setDate(today.getDate() + 1); // Add one day to get tomorrow's date
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, "0");
     const day = String(today.getDate()).padStart(2, "0");
@@ -441,6 +442,7 @@ const UserAppointments = () => {
                   value={appointment.appointmentDate}
                   onChange={handleDateChange}
                   min={getMinDate()}
+                  onKeyDown={(e) => e.preventDefault()}
                   className={`UserAppointments-form-control ${
                     errors.appointmentDate ? "UserAppointments-error" : ""
                   }`}

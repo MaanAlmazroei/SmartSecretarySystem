@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import "./SecResources.css";
 import {
   getAllResources,
@@ -29,23 +29,23 @@ const SecResources = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [editSelectedFile, setEditSelectedFile] = useState(null);
 
-  useEffect(() => {
-    const fetchResources = async () => {
-      try {
-        const response = await getAllResources();
-        if (response.error) {
-          throw new Error(response.error);
-        }
-        setResources(response);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
+  const fetchResources = useCallback(async () => {
+    try {
+      const response = await getAllResources();
+      if (response.error) {
+        throw new Error(response.error);
       }
-    };
-
-    fetchResources();
+      setResources(response);
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchResources();
+  }, [fetchResources]);
 
   const toggleCategory = (index) => {
     setActiveCategory(activeCategory === index ? null : index);
@@ -57,38 +57,6 @@ const SecResources = () => {
       [catIndex]: prev[catIndex] === secIndex ? null : secIndex,
     }));
   };
-
-  // Group resources by type
-  const categories = resources.reduce((acc, resource) => {
-    const existingCategory = acc.find((cat) => cat.title === resource.type);
-    if (existingCategory) {
-      existingCategory.sections.push({
-        title: resource.title,
-        content: resource.description,
-        id: resource.id,
-        createdAt: resource.createdAt,
-        lastUpdatedDate: resource.lastUpdatedDate,
-        fileUrl: resource.fileUrl,
-        fileName: resource.fileName,
-      });
-    } else {
-      acc.push({
-        title: resource.type,
-        sections: [
-          {
-            title: resource.title,
-            content: resource.description,
-            id: resource.id,
-            createdAt: resource.createdAt,
-            lastUpdatedDate: resource.lastUpdatedDate,
-            fileUrl: resource.fileUrl,
-            fileName: resource.fileName,
-          },
-        ],
-      });
-    }
-    return acc;
-  }, []);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -104,13 +72,11 @@ const SecResources = () => {
   const handleNewResourceSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Create FormData object
       const formData = new FormData();
       formData.append("title", newResource.title);
       formData.append("description", newResource.description);
       formData.append("type", newResource.type);
 
-      // Add file if selected
       if (selectedFile) {
         formData.append("file", selectedFile);
       }
@@ -119,7 +85,6 @@ const SecResources = () => {
       if (response.error) {
         throw new Error(response.error);
       }
-      // Refresh resources
       const updatedResources = await getAllResources();
       setResources(updatedResources);
       setShowNewResourceForm(false);
@@ -137,7 +102,6 @@ const SecResources = () => {
         if (response.error) {
           throw new Error(response.error);
         }
-        // Refresh resources
         const updatedResources = await getAllResources();
         setResources(updatedResources);
       } catch (error) {
@@ -159,7 +123,6 @@ const SecResources = () => {
       formData.append("description", editResource.description);
       formData.append("type", editResource.type);
 
-      // Add file if selected
       if (editSelectedFile) {
         formData.append("file", editSelectedFile);
       }
@@ -168,7 +131,6 @@ const SecResources = () => {
       if (response.error) {
         throw new Error(response.error);
       }
-      // Refresh resources
       const updatedResources = await getAllResources();
       setResources(updatedResources);
       setEditingResource(null);
@@ -194,6 +156,39 @@ const SecResources = () => {
       type: category.title,
     });
   };
+
+  const categories = useMemo(() => {
+    return resources.reduce((acc, resource) => {
+      const existingCategory = acc.find((cat) => cat.title === resource.type);
+      if (existingCategory) {
+        existingCategory.sections.push({
+          title: resource.title,
+          content: resource.description,
+          id: resource.id,
+          createdAt: resource.createdAt,
+          lastUpdatedDate: resource.lastUpdatedDate,
+          fileUrl: resource.fileUrl,
+          fileName: resource.fileName,
+        });
+      } else {
+        acc.push({
+          title: resource.type,
+          sections: [
+            {
+              title: resource.title,
+              content: resource.description,
+              id: resource.id,
+              createdAt: resource.createdAt,
+              lastUpdatedDate: resource.lastUpdatedDate,
+              fileUrl: resource.fileUrl,
+              fileName: resource.fileName,
+            },
+          ],
+        });
+      }
+      return acc;
+    }, []);
+  }, [resources]);
 
   if (loading) {
     return (

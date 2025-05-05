@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import "./NoSecResources.css";
 import { getAllResources } from "../../../services/ApiService";
 
@@ -10,23 +10,23 @@ const NoSecResources = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchResources = async () => {
-      try {
-        const response = await getAllResources();
-        if (response.error) {
-          throw new Error(response.error);
-        }
-        setResources(response);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
+  const fetchResources = useCallback(async () => {
+    try {
+      const response = await getAllResources();
+      if (response.error) {
+        throw new Error(response.error);
       }
-    };
-
-    fetchResources();
+      setResources(response);
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchResources();
+  }, [fetchResources]);
 
   const toggleCategory = (index) => {
     setActiveCategory(activeCategory === index ? null : index);
@@ -40,50 +40,46 @@ const NoSecResources = () => {
   };
 
   const handleDownload = (fileUrl, fileName) => {
-    // Create a temporary link element
     const link = document.createElement("a");
     link.href = fileUrl;
-    link.style.display = "none"; // Hide the link
+    link.style.display = "none";
     document.body.appendChild(link);
-
-    // Trigger the download
     link.click();
-
-    // Clean up
     document.body.removeChild(link);
   };
 
-  // Group resources by type
-  const categories = resources.reduce((acc, resource) => {
-    const existingCategory = acc.find((cat) => cat.title === resource.type);
-    if (existingCategory) {
-      existingCategory.sections.push({
-        title: resource.title,
-        content: resource.description,
-        id: resource.id,
-        createdAt: resource.createdAt,
-        lastUpdatedDate: resource.lastUpdatedDate,
-        fileUrl: resource.fileUrl,
-        fileName: resource.fileName,
-      });
-    } else {
-      acc.push({
-        title: resource.type,
-        sections: [
-          {
-            title: resource.title,
-            content: resource.description,
-            id: resource.id,
-            createdAt: resource.createdAt,
-            lastUpdatedDate: resource.lastUpdatedDate,
-            fileUrl: resource.fileUrl,
-            fileName: resource.fileName,
-          },
-        ],
-      });
-    }
-    return acc;
-  }, []);
+  const categories = useMemo(() => {
+    return resources.reduce((acc, resource) => {
+      const existingCategory = acc.find((cat) => cat.title === resource.type);
+      if (existingCategory) {
+        existingCategory.sections.push({
+          title: resource.title,
+          content: resource.description,
+          id: resource.id,
+          createdAt: resource.createdAt,
+          lastUpdatedDate: resource.lastUpdatedDate,
+          fileUrl: resource.fileUrl,
+          fileName: resource.fileName,
+        });
+      } else {
+        acc.push({
+          title: resource.type,
+          sections: [
+            {
+              title: resource.title,
+              content: resource.description,
+              id: resource.id,
+              createdAt: resource.createdAt,
+              lastUpdatedDate: resource.lastUpdatedDate,
+              fileUrl: resource.fileUrl,
+              fileName: resource.fileName,
+            },
+          ],
+        });
+      }
+      return acc;
+    }, []);
+  }, [resources]);
 
   if (loading) {
     return (
@@ -165,7 +161,10 @@ const NoSecResources = () => {
                               className="nosec-resources-downloadBtn"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleDownload(section.fileUrl);
+                                handleDownload(
+                                  section.fileUrl,
+                                  section.fileName
+                                );
                               }}
                             >
                               Download
