@@ -107,29 +107,6 @@ const Profile = () => {
 
   return (
     <div className="profile-container">
-      <div className="profile-content">
-        <div className="profile-sidebar">
-          <div className="profile-avatar">
-            <h3>{`${userData.firstName} ${userData.lastName}`}</h3>
-          </div>
-
-          <nav className="profile-nav">
-            <NavLink
-              to="/profile"
-              end
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Overview
-            </NavLink>
-            <NavLink
-              to="/profile/settings"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Settings
-            </NavLink>
-          </nav>
-        </div>
-
         <div className="profile-details">
           {activeTab === "settings" ? (
             <div className="profile-settings-section">
@@ -224,7 +201,6 @@ const Profile = () => {
           )}
         </div>
       </div>
-    </div>
   );
 };
 
