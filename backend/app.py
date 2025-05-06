@@ -259,17 +259,26 @@ def check_auth():
     return jsonify({"isAuthenticated": False}), 401
 
 
-def send_ticket_email(user_email, data, documentId, type):
-    sender_email = "" # Replace with your email address
-    sender_password = "" # Replace with your email (App) Password
-    receiver_email = user_email
+def send_email(s_email, s_password, r_email, data, documentId, type, status):
+    sender_email = s_email # Replace with your email address
+    sender_password = s_password # Replace with your email (App) Password
+    receiver_email = r_email
 
     message = MIMEMultipart()
     message["From"] = sender_email
     message["To"] = receiver_email
-    message["Subject"] = f"New {type} Created - {documentId}"
 
-    body = f"A new ticket has been created:\nTitle: {data['title']}\nDescription: {data['description']}\n\nBy {session.get('firstName')} {session.get('lastName')}"
+    if (status == "create"):
+        message["Subject"] = f"New {str.capitalize(type)} Created - {documentId}"
+        if (type == "ticket"):
+            body = f"A new {type} has been created:\nTitle: {data['title']}\nDescription: {data['description']}\n\nBy {session.get('firstName')} {session.get('lastName')}"
+        elif (type == "appointment"):
+            body = f"A new {type} has been created:\nTitle: {data['title']}\nDescription: {data['description']}\nAppointment Date: {data['appointmentDate']}\n Appointment Time: {data['appointmentTime']}\n\nBy {session.get('firstName')} {session.get('lastName')}"
+    
+    elif (status == "update"):
+        message["Subject"] = f"{str.capitalize(type)} Updated - {documentId}"
+        body = f"Your {type} has been updated:\nTitle: {data['title']}\nDescription: {data['description']}\nStatus: {data['status']}\nFeedback: {data['feedback']}\n\nThanks,\nSmart Secretary System"
+    
     message.attach(MIMEText(body, "plain"))
 
     try:
@@ -396,10 +405,12 @@ def create_ticket():
     # Add ticket to Firestore with auto-generated ID
     ticket_ref = db.collection('tickets').add(ticket_data)
     
-    # Send email notification to receiver
-    user_email = ""
-    if user_email:
-        send_ticket_email(user_email, ticket_data, ticket_ref[1].id, "Ticket")
+    # Send email notification to secretary
+    sender_email = "official.smartsecretarysystem@gmail.com" # User
+    sender_password = "ygrf wpsi vblg dggi"
+    reciever_email = "nivad94643@idoidraw.com" # Secretary - add any temp mail
+    if reciever_email:
+        send_email(sender_email, sender_password, reciever_email, ticket_data, ticket_ref[1].id, "ticket", "create")
     
     return jsonify({'ticketId': ticket_ref[1].id})
 
@@ -499,6 +510,16 @@ def update_ticket():
     updated_data['lastUpdatedDate'] = firestore.SERVER_TIMESTAMP
     
     db.collection('tickets').document(ticket_id).update(updated_data)
+    ticket_doc = db.collection('tickets').document(ticket_id).get()
+    ticket_data = ticket_doc.to_dict()
+
+    # Send email notification to user
+    sender_email = "official.smartsecretarysystem@gmail.com" # Secretary
+    sender_password = "ygrf wpsi vblg dggi"
+    reciever_email = "nivad94643@idoidraw.com" # User - add any temp mail
+    if reciever_email:
+        send_email(sender_email, sender_password, reciever_email, ticket_data, ticket_id, "ticket", "update")
+    
     return jsonify({"message": "Ticket updated successfully"})
 
 
@@ -602,6 +623,13 @@ def create_appointment():
     
     # Add appointment to Firestore with auto-generated ID
     appointment_ref = db.collection('appointments').add(appointment_data)
+
+    # Send email notification to secretary
+    sender_email = "official.smartsecretarysystem@gmail.com" # User
+    sender_password = "ygrf wpsi vblg dggi"
+    reciever_email = "nivad94643@idoidraw.com" # Secretary - add any temp mail
+    if reciever_email:
+        send_email(sender_email, sender_password, reciever_email, appointment_data, appointment_ref[1].id, "appointment", "create")
     
     return jsonify({'appointmentId': appointment_ref[1].id})
 
@@ -701,6 +729,15 @@ def update_appointment():
     updated_data['lastUpdatedDate'] = firestore.SERVER_TIMESTAMP
     
     db.collection('appointments').document(appointment_id).update(updated_data)
+    appointment_data = appointment_doc.to_dict()
+
+    # Send email notification to user
+    sender_email = "official.smartsecretarysystem@gmail.com" # Secretary
+    sender_password = "ygrf wpsi vblg dggi"
+    reciever_email = "nivad94643@idoidraw.com" # User - add any temp mail
+    if reciever_email:
+        send_email(sender_email, sender_password, reciever_email, appointment_data, appointment_id, "appointment", "update")
+    
     return jsonify({"message": "Appointment updated successfully"})
 
 
