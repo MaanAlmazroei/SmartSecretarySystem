@@ -5,6 +5,13 @@ describe("Chatbot Component", () => {
   beforeEach(() => {
     // Mocking scrollTo function
     HTMLElement.prototype.scrollTo = jest.fn();
+    // supressing the console errors 
+    jest.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    // Restore console.error after tests
+    console.error.mockRestore();
   });
 
   const setupChatbot = () => {
@@ -64,7 +71,7 @@ describe("Chatbot Component", () => {
   test("handles API errors", async () => {
     // Mock failed API response
     mockFetchResponse(false, {
-      error: { message: "Something went wrong" },
+      error: { message: "API Error:" },
     });
 
     const { inputField, sendButton } = setupChatbot();

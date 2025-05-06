@@ -66,4 +66,19 @@ describe('Login Component', () => {
     expect(rememberMeCheckbox.checked).toBe(true);
   });
 
+  test("updates formData state when input fields change", () => {
+
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+
+    // Simulate user typing in email field
+    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
+    expect(emailInput.value).toBe("test@example.com");
+
+    // Simulate user typing in password field
+    fireEvent.change(passwordInput, { target: { value: "Password123" } });
+    expect(passwordInput.value).toBe("Password123");
+  });
+
+
 });

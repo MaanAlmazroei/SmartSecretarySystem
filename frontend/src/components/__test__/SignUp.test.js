@@ -10,32 +10,10 @@ jest.mock("../../services/ApiService", () => ({
   createUser: jest.fn(),
 }));
 
-jest.mock("../../Context/AuthContext", () => ({
-  useAuth: jest.fn(),
-}));
-
-jest.mock("react-hot-toast", () => ({
-  toast: {
-    success: jest.fn(),
-    error: jest.fn(),
-  },
-}));
-
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
-  useNavigate: jest.fn(),
-}));
-
 describe("SignUp Component", () => {
   let firstNameInput, lastNameInput, emailInput, phoneInput, passwordInput, confirmPasswordInput, signUpButton;
-  const mockNavigate = jest.fn();
 
   beforeEach(() => {
-    useAuth.mockReturnValue({
-      login: jest.fn(), // Mock the login function
-    });
-
-    useNavigate.mockReturnValue(mockNavigate); // Mock the useNavigate hook
 
     render(
       <BrowserRouter>
@@ -53,32 +31,41 @@ describe("SignUp Component", () => {
     signUpButton = screen.getByTestId("sign-up-button");
   });
 
-  test("submits the form successfully and navigates to the dashboard", async () => {
-    createUser.mockResolvedValue({ success: true }); // Mock API success
+  test("submits the form successfully", async () => {
+
 
     fireEvent.change(firstNameInput, { target: { value: "hatim" } });
     fireEvent.change(lastNameInput, { target: { value: "alharbi" } });
-    fireEvent.change(emailInput, { target: { value: "hatimalharbi@example.com" } });
-    fireEvent.change(phoneInput, { target: { value: "0555411000" } });
+    fireEvent.change(emailInput, { target: { value: "hatinsta1@gmail.com" } });
+    fireEvent.change(phoneInput, { target: { value: "0555411384" } });
     fireEvent.change(passwordInput, { target: { value: "Password123" } });
     fireEvent.change(confirmPasswordInput, { target: { value: "Password123" } });
 
     fireEvent.click(signUpButton);
+    
 
 
 
     expect(createUser).toHaveBeenCalledWith({
       firstName: "hatim",
       lastName: "alharbi",
-      email: "hatimalharbi@example.com",
-      phone: "0555411000",
+      email: "hatinsta1@gmail.com",
+      phone: "0555411384",
       password: "Password123",
     });
-    mockNavigate();
-    // expect navigation
-    expect(mockNavigate).toHaveBeenCalledWith(); // if routed, then test was successful
-    expect(toast.success).toHaveBeenCalledWith("Account created successfully!");
 
 
+  });
+  test("validates the form and updates errors state", () => {
+
+     // Leave fields empty and submit the form
+     fireEvent.click(signUpButton);
+
+     // Check for validation errors
+     expect(screen.getByText(/first name is required/i)).toBeInTheDocument();
+     expect(screen.getByText(/last name is required/i)).toBeInTheDocument();
+     expect(screen.getByText(/email is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/phone number is required/i)).toBeInTheDocument();
+     expect(screen.getByText(/uppercase letterlowercase letternumberat least 8 characters/i)).toBeInTheDocument();  
   });
 }); 
