@@ -21,7 +21,7 @@ function ForgotPassword() {
   };
 
   const validateEmail = () => {
-    const emailValid = formData.email.trim() !== "";
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim());
     setErrors({
       email: emailValid ? "" : "Email is required",
       submitted: true,
@@ -37,6 +37,7 @@ function ForgotPassword() {
         await sendPasswordResetEmail(auth, formData.email);
         toast.success("Password reset link sent to your email.");
         setTimeout(() => {
+          console.log("Navigating to /login");
           navigate("/login");
         }, 500);
       } catch (error) {

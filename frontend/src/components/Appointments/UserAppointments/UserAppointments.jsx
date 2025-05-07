@@ -42,6 +42,7 @@ const UserAppointments = () => {
   const [appointment, setAppointment] = useState({
     ...initialAppointmentState,
   });
+  const [apiError, setApiError] = useState("");
   const [errors, setErrors] = useState({});
   const [appointmentsList, setAppointmentsList] = useState([]);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
@@ -245,7 +246,9 @@ const UserAppointments = () => {
       await fetchAppointments();
       setAppointment({ ...initialAppointmentState });
       setSelectedAppointmentId(null);
+      setApiError("");
     } catch (error) {
+      setApiError("Error creating appointment: " + error.message); // setting apiError state
       console.error("Error creating appointment:", error.message);
     }
   };
@@ -414,6 +417,11 @@ const UserAppointments = () => {
             </div>
           ) : (
             <form className="UserAppointments-form" onSubmit={handleSubmit}>
+                {apiError && (
+                <div className="UserAppointments-api-error" role="alert">
+                {apiError}
+                </div>
+                        )}
               <div className="UserAppointments-form-group">
                 <label htmlFor="title">Appointment Title *</label>
                 <input

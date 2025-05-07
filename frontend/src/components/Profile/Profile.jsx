@@ -112,8 +112,9 @@ const Profile = () => {
             <div className="profile-settings-section">
               <h2>Account Settings</h2>
               <div className="profile-setting-item">
-                <label>
+                <label htmlFor="notifications">
                   <input
+                    id="notifications"
                     type="checkbox"
                     name="notifications"
                     checked={settings.notifications}
@@ -123,8 +124,9 @@ const Profile = () => {
                 </label>
               </div>
               <div className="profile-setting-item">
-                <label>Language</label>
+                <label htmlFor="language">Language</label>
                 <select
+                  id="language"
                   name="language"
                   value={settings.language}
                   onChange={handleSettingsChange}
@@ -147,8 +149,9 @@ const Profile = () => {
 
               <form onSubmit={handleSubmit}>
                 <div className="profile-form-group">
-                  <label>First Name</label>
-                  <input
+                <label htmlFor="firstName">First Name</label>
+                <input
+                    id="firstName" // testing purposes
                     type="text"
                     name="firstName"
                     value={userData.firstName}
@@ -158,8 +161,9 @@ const Profile = () => {
                 </div>
 
                 <div className="profile-form-group">
-                  <label>Last Name</label>
-                  <input
+                <label htmlFor="lastName">Last Name</label>
+                <input
+                    id="lastName" // testing purposes
                     type="text"
                     name="lastName"
                     value={userData.lastName}
@@ -169,8 +173,9 @@ const Profile = () => {
                 </div>
 
                 <div className="profile-form-group">
-                  <label>Email</label>
-                  <input
+                <label htmlFor="email">Email</label>
+                <input
+                    id="email"
                     type="email"
                     name="email"
                     value={userData.email}
@@ -179,8 +184,9 @@ const Profile = () => {
                 </div>
 
                 <div className="profile-form-group">
-                  <label>Phone</label>
-                  <input
+                <label htmlFor="phone">Phone</label>
+                <input
+                    id="phone" // testing purposes
                     type="tel"
                     name="phone"
                     value={userData.phone}
