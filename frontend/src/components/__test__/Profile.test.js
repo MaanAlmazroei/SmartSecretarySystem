@@ -12,9 +12,9 @@ const mockUser = { uid: "user123", email: "test@mail.com" };
 beforeEach(() => {
   useAuth.mockReturnValue({ user: mockUser });
   getUser.mockResolvedValue({
-    firstName: "John",
-    lastName: "Doe",
-    phone: "1234567890",
+    firstName: "Hatim",
+    lastName: "Alharbi",
+    phone: "0555411384",
   });
   updateUser.mockResolvedValue({});
 });
@@ -32,7 +32,7 @@ test("shows error state", async () => {
 
 test("renders profile overview and toggles edit mode", async () => {
   render(<Profile />, { wrapper: MemoryRouter });
-  expect(await screen.findByDisplayValue("John")).toBeInTheDocument();
+  expect(await screen.findByDisplayValue("Hatim")).toBeInTheDocument();
   expect(screen.getByLabelText(/First Name/i)).toBeDisabled();
 
   fireEvent.click(screen.getByText(/Edit Profile/i));
@@ -42,9 +42,9 @@ test("renders profile overview and toggles edit mode", async () => {
 test("updates fields and saves changes", async () => {
   render(<Profile />, { wrapper: MemoryRouter });
   fireEvent.click(await screen.findByText(/Edit Profile/i));
-  fireEvent.change(screen.getByLabelText(/First Name/i), { target: { value: "Jane" } });
+  fireEvent.change(screen.getByLabelText(/First Name/i), { target: { value: "Mohammed" } });
   fireEvent.click(screen.getByText(/Save Changes/i));
-  await waitFor(() => expect(updateUser).toHaveBeenCalledWith("user123", expect.objectContaining({ firstName: "Jane" })));
+  await waitFor(() => expect(updateUser).toHaveBeenCalledWith("user123", expect.objectContaining({ firstName: "Mohammed" })));
 });
 
 test("shows error if update fails", async () => {
