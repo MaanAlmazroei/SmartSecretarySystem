@@ -1,5 +1,5 @@
 import React from 'react';
-import ChatbotIcon from '../ChatbotIcon/ChatbotIcon';
+import ChatbotIcon from './ChatbotIcon';
 
 const ChatMessage = ({chat}) => {
     // Check for both "model" and "bot" roles to handle any inconsistencies

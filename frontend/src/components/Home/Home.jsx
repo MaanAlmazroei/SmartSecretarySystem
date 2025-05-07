@@ -12,7 +12,7 @@ const Home = () => {
           <div className="Home-image-text">
             <h1 className="Home-image-text-heading">Welcome to Smart Secretary System</h1>
             <p className="Home-image-text-paragraph">
-              Your digital assistant for managing campus services with ease!
+              Your digital assistant for managing FCIT services with ease!
               Whether you need to book an appointment, submit a request, or get
               quick answers, our system is here to help.
             </p>

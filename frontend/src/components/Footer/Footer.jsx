@@ -45,9 +45,9 @@ const Footer = () => {
           <h4 className="footer-subheading">Department Contact</h4>
           <address className="footer-address">
             <p>IT Department Office</p>
-            <p>FCIT Building, Room #</p>
+            <p>FCIT Building 80A, Room #</p>
             <p>Email: fcit-it@kau.edu.sa</p>
-            <p>Office Hours: #AM - #PM</p>
+            <p>Office Hours: 8AM - 5PM</p>
           </address>
         </div>
       </div>

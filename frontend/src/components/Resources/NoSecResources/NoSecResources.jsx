@@ -10,6 +10,7 @@ const NoSecResources = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  //useCallback to memoizes the function to prevent unnecessary recreations on every render
   const fetchResources = useCallback(async () => {
     try {
       const response = await getAllResources();
@@ -22,13 +23,13 @@ const NoSecResources = () => {
       setError(error.message);
       setLoading(false);
     }
-  }, []);
+  }, []);// empty dependency array [] means it is created only once
 
   useEffect(() => {
     fetchResources();
   }, [fetchResources]);
 
-  const toggleCategory = (index) => {
+  const toggleCategory = (index) => { //index = The position/number of the category being clicked
     setActiveCategory(activeCategory === index ? null : index);
   };
 
