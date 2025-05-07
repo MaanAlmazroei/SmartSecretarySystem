@@ -17,6 +17,7 @@ beforeEach(() => {
     ApiService.checkTimeSlotAvailability.mockResolvedValue({ isAvailable: true }); // Mock API response for time slot availability
     ApiService.checkAuth.mockResolvedValue({}); // Mock API response for authentication check
 });
+describe("UserAppointments Component", () => {
 
 // Display a message when no appointments are found
 test("shows no appointments message", async () => {
@@ -92,4 +93,18 @@ test("handles close button", async () => {
     fireEvent.click(await screen.findByText("Apt 1")); // Open appointment details
     fireEvent.click(screen.getByText("Close")); // Close the details view
     expect(screen.getByLabelText(/Appointment Title/i)).toBeInTheDocument(); // Verify the form is displayed again
+});
+
+test("shows error message if createAppointment API fails", async () => {
+    ApiService.createAppointment.mockRejectedValueOnce(new Error("API Error"));
+    render(<UserAppointments />);
+    fireEvent.change(screen.getByLabelText(/Appointment Title/i), { target: { value: "Test" } });
+    fireEvent.change(screen.getByLabelText(/Date/i), { target: { value: "2099-12-31" } });
+    fireEvent.change(screen.getByLabelText(/Description/i), { target: { value: "A valid description" } });
+    fireEvent.click(screen.getByText("09:00 AM"));
+    fireEvent.click(screen.getByText(/Schedule Appointment/i));
+    // Wait for error message to appear
+    expect(await screen.findByText(/Error creating appointment:/i)).toBeInTheDocument();
+  });
+
 });
