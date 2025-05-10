@@ -38,6 +38,14 @@ const Footer = () => {
                 Profile
               </Link>
             </li>
+            <li>
+              <Link to="https://docs.google.com/forms/d/e/1FAIpQLSf_BOlGVRzFOyV_Qqt3whabtvrpMQP6fW7kooHI4i11pnAV0A/viewform?usp=dialog" 
+              className="footer-link"
+              target="_blank"
+              >
+                Feedback
+              </Link>
+            </li>
           </ul>
         </div>
 
