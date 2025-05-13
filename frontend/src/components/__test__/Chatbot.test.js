@@ -5,7 +5,7 @@ describe("Chatbot Component", () => {
   beforeEach(() => {
     // Mocking scrollTo function
     HTMLElement.prototype.scrollTo = jest.fn();
-    // supressing the console errors 
+    // supressing the console errors
     jest.spyOn(console, "error").mockImplementation(() => {});
   });
 
@@ -20,7 +20,7 @@ describe("Chatbot Component", () => {
     const sendButton = screen.getByText(/Send/i);
     return { inputField, sendButton };
   };
-  // mock fetch response api 
+  // mock fetch response api
   const mockFetchResponse = (ok, response) => {
     global.fetch = jest.fn(() =>
       Promise.resolve({

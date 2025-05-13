@@ -42,9 +42,16 @@ test("renders profile overview and toggles edit mode", async () => {
 test("updates fields and saves changes", async () => {
   render(<Profile />, { wrapper: MemoryRouter });
   fireEvent.click(await screen.findByText(/Edit Profile/i));
-  fireEvent.change(screen.getByLabelText(/First Name/i), { target: { value: "Mohammed" } });
+  fireEvent.change(screen.getByLabelText(/First Name/i), {
+    target: { value: "Mohammed" },
+  });
   fireEvent.click(screen.getByText(/Save Changes/i));
-  await waitFor(() => expect(updateUser).toHaveBeenCalledWith("user123", expect.objectContaining({ firstName: "Mohammed" })));
+  await waitFor(() =>
+    expect(updateUser).toHaveBeenCalledWith(
+      "user123",
+      expect.objectContaining({ firstName: "Mohammed" })
+    )
+  );
 });
 
 test("shows error if update fails", async () => {
@@ -63,5 +70,7 @@ test("renders settings tab and updates settings", async () => {
   );
   expect(await screen.findByText(/Account Settings/i)).toBeInTheDocument();
   fireEvent.click(screen.getByLabelText(/Email Notifications/i));
-  fireEvent.change(screen.getByLabelText(/Language/i), { target: { value: "English" } });
+  fireEvent.change(screen.getByLabelText(/Language/i), {
+    target: { value: "English" },
+  });
 });

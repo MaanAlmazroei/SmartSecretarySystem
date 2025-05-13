@@ -23,13 +23,14 @@ const NoSecResources = () => {
       setError(error.message);
       setLoading(false);
     }
-  }, []);// empty dependency array [] means it is created only once
+  }, []); // empty dependency array [] means it is created only once
 
   useEffect(() => {
     fetchResources();
   }, [fetchResources]);
 
-  const toggleCategory = (index) => { //index = The position/number of the category being clicked
+  const toggleCategory = (index) => {
+    //index = The position/number of the category being clicked
     setActiveCategory(activeCategory === index ? null : index);
   };
 

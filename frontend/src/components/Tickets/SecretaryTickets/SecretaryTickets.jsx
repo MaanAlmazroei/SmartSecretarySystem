@@ -110,15 +110,15 @@ const SecretaryTickets = () => {
       if (response.error) {
         throw new Error(response.error);
       }
-      
+
       if (selectedTicket && selectedTicket.id === ticketId) {
         setSelectedTicket({
           ...selectedTicket,
           status: newStatus,
-          lastUpdatedDate: new Date().toISOString()
+          lastUpdatedDate: new Date().toISOString(),
         });
       }
-      
+
       await fetchAllTickets();
     } catch (error) {
       console.error("Error updating ticket status:", error.message);

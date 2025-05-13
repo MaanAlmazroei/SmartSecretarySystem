@@ -70,7 +70,9 @@ const SecretaryAppointments = () => {
 
     // Apply status filter
     if (status !== "All") {
-      filtered = filtered.filter((appointment) => appointment.status === status);
+      filtered = filtered.filter(
+        (appointment) => appointment.status === status
+      );
     }
 
     // Apply search filter
@@ -83,9 +85,9 @@ const SecretaryAppointments = () => {
           `${appointment.userFirstName} ${appointment.userLastName}`
             .toLowerCase()
             .includes(searchLower) ||
-          (appointment.appointmentDate && 
+          (appointment.appointmentDate &&
             appointment.appointmentDate.toLowerCase().includes(searchLower)) ||
-          (appointment.appointmentTime && 
+          (appointment.appointmentTime &&
             appointment.appointmentTime.toLowerCase().includes(searchLower))
       );
     }
@@ -117,20 +119,22 @@ const SecretaryAppointments = () => {
   // Update the appointment status
   const handleStatusChange = async (appointmentId, newStatus) => {
     try {
-      const response = await updateAppointment(appointmentId, { status: newStatus });
+      const response = await updateAppointment(appointmentId, {
+        status: newStatus,
+      });
       if (response.error) {
         throw new Error(response.error);
       }
-      
+
       // Update the selected appointment locally before fetching all appointments
       if (selectedAppointment && selectedAppointment.id === appointmentId) {
         setSelectedAppointment({
           ...selectedAppointment,
           status: newStatus,
-          lastUpdatedDate: new Date().toISOString()
+          lastUpdatedDate: new Date().toISOString(),
         });
       }
-      
+
       // Then refresh all appointments
       await fetchAllAppointments();
     } catch (error) {
@@ -197,33 +201,33 @@ const SecretaryAppointments = () => {
       </header>
 
       <div className="secretary-appointment-filters">
-  <div className="secretary-appointment-filter-group secretary-appointment-status-filter">
-    <label htmlFor="statusFilter">Filter by Status:</label>
-    <select
-      id="statusFilter"
-      value={statusFilter}
-      onChange={handleStatusFilterChange}
-      className="secretary-appointment-filter-select"
-    >
-      <option value="All">All Statuses</option>
-      <option value="In Progress">In Progress</option>
-      <option value="Approved">Approved</option>
-      <option value="Rejected">Rejected</option>
-    </select>
-  </div>
+        <div className="secretary-appointment-filter-group secretary-appointment-status-filter">
+          <label htmlFor="statusFilter">Filter by Status:</label>
+          <select
+            id="statusFilter"
+            value={statusFilter}
+            onChange={handleStatusFilterChange}
+            className="secretary-appointment-filter-select"
+          >
+            <option value="All">All Statuses</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
 
-  <div className="secretary-appointment-filter-group secretary-appointment-search-group">
-    <label htmlFor="appointmentSearch">Search Appointments:</label>
-    <input
-      type="text"
-      id="appointmentSearch"
-      placeholder="Search by title, description or name"
-      value={searchTerm}
-      onChange={handleSearchChange}
-      className="secretary-appointment-search-input"
-    />
-  </div>
-</div>
+        <div className="secretary-appointment-filter-group secretary-appointment-search-group">
+          <label htmlFor="appointmentSearch">Search Appointments:</label>
+          <input
+            type="text"
+            id="appointmentSearch"
+            placeholder="Search by title, description or name"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="secretary-appointment-search-input"
+          />
+        </div>
+      </div>
 
       <div className="secretary-appointment-main">
         {/* Left Panel: Appointments List */}
@@ -245,39 +249,41 @@ const SecretaryAppointments = () => {
             </div>
           ) : (
             <div className="secretary-appointment-list">
-
-{filteredAppointments.map((appointment) => (
-  <div
-    key={appointment.id}
-    className={`secretary-appointment-item ${
-      selectedAppointmentId === appointment.id
-        ? "secretary-appointment-selected"
-        : ""
-    }`}
-    onClick={() => selectAppointment(appointment.id)}
-  >
-    <div className="secretary-appointment-header">
-      <h3>{appointment.title}</h3>
-      <span
-        className={`secretary-appointment-status ${getStatusClass(
-          appointment.status
-        )}`}
-      >
-        {appointment.status}
-      </span>
-    </div>
-    <div className="secretary-appointment-schedule">
-      <span>Date: {appointment.appointmentDate}</span>
-      <span>Time: {appointment.appointmentTime}</span>
-    </div>
-    <p className="secretary-appointment-description">
-      {appointment.description.substring(0, 50)}...
-    </p>
-    <div className="secretary-appointment-user-info">
-      <span>User: {appointment.userFirstName} {appointment.userLastName}</span>
-    </div>
-  </div>
-))}
+              {filteredAppointments.map((appointment) => (
+                <div
+                  key={appointment.id}
+                  className={`secretary-appointment-item ${
+                    selectedAppointmentId === appointment.id
+                      ? "secretary-appointment-selected"
+                      : ""
+                  }`}
+                  onClick={() => selectAppointment(appointment.id)}
+                >
+                  <div className="secretary-appointment-header">
+                    <h3>{appointment.title}</h3>
+                    <span
+                      className={`secretary-appointment-status ${getStatusClass(
+                        appointment.status
+                      )}`}
+                    >
+                      {appointment.status}
+                    </span>
+                  </div>
+                  <div className="secretary-appointment-schedule">
+                    <span>Date: {appointment.appointmentDate}</span>
+                    <span>Time: {appointment.appointmentTime}</span>
+                  </div>
+                  <p className="secretary-appointment-description">
+                    {appointment.description.substring(0, 50)}...
+                  </p>
+                  <div className="secretary-appointment-user-info">
+                    <span>
+                      User: {appointment.userFirstName}{" "}
+                      {appointment.userLastName}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </section>
@@ -307,26 +313,38 @@ const SecretaryAppointments = () => {
 
               <div className="secretary-appointment-detail-metadata">
                 <div className="secretary-appointment-metadata-item">
-                  <span className="secretary-appointment-label">Submitted by:</span>
+                  <span className="secretary-appointment-label">
+                    Submitted by:
+                  </span>
                   <span>
-                    {selectedAppointment.userFirstName} {selectedAppointment.userLastName}
+                    {selectedAppointment.userFirstName}{" "}
+                    {selectedAppointment.userLastName}
                   </span>
                 </div>
                 <div className="secretary-appointment-metadata-item">
-                  <span className="secretary-appointment-label">Scheduled for:</span>
+                  <span className="secretary-appointment-label">
+                    Scheduled for:
+                  </span>
                   <span>
-                    {selectedAppointment.appointmentDate} at {selectedAppointment.appointmentTime}
+                    {selectedAppointment.appointmentDate} at{" "}
+                    {selectedAppointment.appointmentTime}
                   </span>
                 </div>
                 <div className="secretary-appointment-metadata-item">
-                  <span className="secretary-appointment-label">Submitted on:</span>
+                  <span className="secretary-appointment-label">
+                    Submitted on:
+                  </span>
                   <span>{formatDate(selectedAppointment.createdAt)}</span>
                 </div>
                 {selectedAppointment.createdAt !==
                   selectedAppointment.lastUpdatedDate && (
                   <div className="secretary-appointment-metadata-item">
-                    <span className="secretary-appointment-label">Last updated:</span>
-                    <span>{formatDate(selectedAppointment.lastUpdatedDate)}</span>
+                    <span className="secretary-appointment-label">
+                      Last updated:
+                    </span>
+                    <span>
+                      {formatDate(selectedAppointment.lastUpdatedDate)}
+                    </span>
                   </div>
                 )}
               </div>
@@ -408,7 +426,8 @@ const SecretaryAppointments = () => {
                 <div className="secretary-appointment-selection-icon">📅</div>
                 <h3>No Appointment Selected</h3>
                 <p>
-                  Select an appointment from the list to view details and manage it.
+                  Select an appointment from the list to view details and manage
+                  it.
                 </p>
               </div>
             </div>

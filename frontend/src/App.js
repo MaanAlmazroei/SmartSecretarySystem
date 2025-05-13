@@ -54,7 +54,7 @@ function AppRoutes() {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
-      <Route path="/ForgotPassword" element={<ForgotPassword />} />
+      <Route path="/forgotPassword" element={<ForgotPassword />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/login" element={<Login />} />
       <Route

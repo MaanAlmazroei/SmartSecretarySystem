@@ -417,11 +417,11 @@ const UserAppointments = () => {
             </div>
           ) : (
             <form className="UserAppointments-form" onSubmit={handleSubmit}>
-                {apiError && (
+              {apiError && (
                 <div className="UserAppointments-api-error" role="alert">
-                {apiError}
+                  {apiError}
                 </div>
-                        )}
+              )}
               <div className="UserAppointments-form-group">
                 <label htmlFor="title">Appointment Title *</label>
                 <input

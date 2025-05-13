@@ -11,17 +11,21 @@ jest.mock("../../services/ApiService", () => ({
 }));
 
 describe("SignUp Component", () => {
-  let firstNameInput, lastNameInput, emailInput, phoneInput, passwordInput, confirmPasswordInput, signUpButton;
+  let firstNameInput,
+    lastNameInput,
+    emailInput,
+    phoneInput,
+    passwordInput,
+    confirmPasswordInput,
+    signUpButton;
 
   beforeEach(() => {
-
     render(
       <BrowserRouter>
         <SignUp />
       </BrowserRouter>
     );
 
-    
     firstNameInput = screen.getByLabelText(/first name/i);
     lastNameInput = screen.getByLabelText(/last name/i);
     emailInput = screen.getByLabelText(/email/i);
@@ -32,19 +36,16 @@ describe("SignUp Component", () => {
   });
 
   test("submits the form successfully", async () => {
-
-
     fireEvent.change(firstNameInput, { target: { value: "hatim" } });
     fireEvent.change(lastNameInput, { target: { value: "alharbi" } });
     fireEvent.change(emailInput, { target: { value: "hatinsta1@gmail.com" } });
     fireEvent.change(phoneInput, { target: { value: "0555411384" } });
     fireEvent.change(passwordInput, { target: { value: "Password123" } });
-    fireEvent.change(confirmPasswordInput, { target: { value: "Password123" } });
+    fireEvent.change(confirmPasswordInput, {
+      target: { value: "Password123" },
+    });
 
     fireEvent.click(signUpButton);
-    
-
-
 
     expect(createUser).toHaveBeenCalledWith({
       firstName: "hatim",
@@ -53,19 +54,20 @@ describe("SignUp Component", () => {
       phone: "0555411384",
       password: "Password123",
     });
-
-
   });
   test("validates the form and updates errors state", () => {
+    // Leave fields empty and submit the form
+    fireEvent.click(signUpButton);
 
-     // Leave fields empty and submit the form
-     fireEvent.click(signUpButton);
-
-     // Check for validation errors
-     expect(screen.getByText(/first name is required/i)).toBeInTheDocument();
-     expect(screen.getByText(/last name is required/i)).toBeInTheDocument();
-     expect(screen.getByText(/email is required/i)).toBeInTheDocument();
-      expect(screen.getByText(/phone number is required/i)).toBeInTheDocument();
-     expect(screen.getByText(/uppercase letterlowercase letternumberat least 8 characters/i)).toBeInTheDocument();  
+    // Check for validation errors
+    expect(screen.getByText(/first name is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/last name is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/email is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/phone number is required/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /uppercase letterlowercase letternumberat least 8 characters/i
+      )
+    ).toBeInTheDocument();
   });
-}); 
+});

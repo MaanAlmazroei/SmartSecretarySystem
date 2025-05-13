@@ -1,26 +1,28 @@
-import ChatbotIcon from './ChatbotIcon';
+import ChatbotIcon from "./ChatbotIcon";
 import React, { useEffect, useRef, useState } from "react";
 import "./Chatbot.css";
-import ChatbotForm from './ChatbotForm';
-import ChatMessage from './ChatMessage';
+import ChatbotForm from "./ChatbotForm";
+import ChatMessage from "./ChatMessage";
 
 const Chatbot = () => {
-  const [chatHistory, setChatHistory] = useState([{
-    hideInChat: true,
-    role: "model"
-  }]);
+  const [chatHistory, setChatHistory] = useState([
+    {
+      hideInChat: true,
+      role: "model",
+    },
+  ]);
   const [isMinimized, setIsMinimized] = useState(false);
   const chatBodyRef = useRef();
-  
+
   const toggleMinimize = () => {
     setIsMinimized(!isMinimized);
   };
 
   const generateBotResponse = async (history) => {
     // Format history to match Gemini's expected structure
-    const contents = history.map(({role, text}) => ({
+    const contents = history.map(({ role, text }) => ({
       role: role === "user" ? "user" : "model",
-      parts: [{text}]
+      parts: [{ text }],
     }));
 
     const API_URL = `${process.env.REACT_APP_CHATBOT_API_URL}?key=${process.env.REACT_APP_CHATBOT_API_KEY}`;
@@ -29,14 +31,16 @@ const Chatbot = () => {
     try {
       const response = await fetch(API_URL, {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          contents: [{
-            parts: contents[contents.length - 1].parts
-          }]
-        })
+          contents: [
+            {
+              parts: contents[contents.length - 1].parts,
+            },
+          ],
+        }),
       });
 
       if (!response.ok) {
@@ -50,38 +54,55 @@ const Chatbot = () => {
 
       // Process the response text
       const apiResponseText = data.candidates[0].content.parts[0].text
-        .replace(/\*\*(.*?)\*\*/g, "$1")  // Removes markdown bold (**)
+        .replace(/\*\*(.*?)\*\*/g, "$1") // Removes markdown bold (**)
         .trim();
 
       // Replace the "Thinking..." message with the actual response
-      setChatHistory(prev => {
+      setChatHistory((prev) => {
         // Remove the "Thinking..." message
-        const withoutThinking = prev.filter(msg => !(msg.text === "Thinking..." && (msg.role === "model" || msg.role === "bot")));
+        const withoutThinking = prev.filter(
+          (msg) =>
+            !(
+              msg.text === "Thinking..." &&
+              (msg.role === "model" || msg.role === "bot")
+            )
+        );
         // Add the new bot response
         return [...withoutThinking, { role: "model", text: apiResponseText }];
       });
-
-    } catch(error) {
+    } catch (error) {
       console.error("API Error:", error);
       // Replace the "Thinking..." message with an error message
-      setChatHistory(prev => {
+      setChatHistory((prev) => {
         // Remove the "Thinking..." message
-        const withoutThinking = prev.filter(msg => !(msg.text === "Thinking..." && (msg.role === "model" || msg.role === "bot")));
+        const withoutThinking = prev.filter(
+          (msg) =>
+            !(
+              msg.text === "Thinking..." &&
+              (msg.role === "model" || msg.role === "bot")
+            )
+        );
         // Add the error message
-        return [...withoutThinking, { role: "model", text: "Sorry, I encountered an error. Please try again." }];
+        return [
+          ...withoutThinking,
+          {
+            role: "model",
+            text: "Sorry, I encountered an error. Please try again.",
+          },
+        ];
       });
     }
   };
-  
-  useEffect(()=>{
+
+  useEffect(() => {
     // Auto-scroll whenever chat history updates
     if (chatBodyRef.current && !isMinimized) {
       chatBodyRef.current.scrollTo({
         top: chatBodyRef.current.scrollHeight,
-        behavior: "smooth"
+        behavior: "smooth",
       });
     }
-  },[chatHistory, isMinimized]);
+  }, [chatHistory, isMinimized]);
 
   return (
     <div className="Chatbot-wrapper">
@@ -100,7 +121,7 @@ const Chatbot = () => {
                 <ChatbotIcon />
                 <h2 className="Chatbot-logo-text">Chatbot</h2>
               </div>
-              <button 
+              <button
                 className="Chatbot-close-button material-symbols-rounded"
                 onClick={toggleMinimize}
               >
@@ -118,15 +139,15 @@ const Chatbot = () => {
               </div>
               {/* Render the chat history dynamically */}
               {chatHistory.map((chat, index) => (
-                <ChatMessage key={index} chat={chat}/>
+                <ChatMessage key={index} chat={chat} />
               ))}
             </div>
 
             {/* Chatbot Footer */}
             <div className="Chatbot-footer">
-              <ChatbotForm 
-                chatHistory={chatHistory} 
-                setChatHistory={setChatHistory} 
+              <ChatbotForm
+                chatHistory={chatHistory}
+                setChatHistory={setChatHistory}
                 generateBotResponse={generateBotResponse}
               />
             </div>

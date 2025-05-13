@@ -107,106 +107,106 @@ const Profile = () => {
 
   return (
     <div className="profile-container">
-        <div className="profile-details">
-          {activeTab === "settings" ? (
-            <div className="profile-settings-section">
-              <h2>Account Settings</h2>
-              <div className="profile-setting-item">
-                <label htmlFor="notifications">
-                  <input
-                    id="notifications"
-                    type="checkbox"
-                    name="notifications"
-                    checked={settings.notifications}
-                    onChange={handleSettingsChange}
-                  />
-                  Email Notifications
-                </label>
-              </div>
-              <div className="profile-setting-item">
-                <label htmlFor="language">Language</label>
-                <select
-                  id="language"
-                  name="language"
-                  value={settings.language}
+      <div className="profile-details">
+        {activeTab === "settings" ? (
+          <div className="profile-settings-section">
+            <h2>Account Settings</h2>
+            <div className="profile-setting-item">
+              <label htmlFor="notifications">
+                <input
+                  id="notifications"
+                  type="checkbox"
+                  name="notifications"
+                  checked={settings.notifications}
                   onChange={handleSettingsChange}
-                >
-                  <option value="English">English</option>
-                </select>
-              </div>
+                />
+                Email Notifications
+              </label>
             </div>
-          ) : (
-            <div className="profile-overview-section">
-              <div className="profile-header">
-                <h2>Profile Overview</h2>
-                <button
-                  className="profile-edit-button"
-                  onClick={() => setEditMode(!editMode)}
-                >
-                  {editMode ? "Cancel" : "Edit Profile"}
-                </button>
-              </div>
+            <div className="profile-setting-item">
+              <label htmlFor="language">Language</label>
+              <select
+                id="language"
+                name="language"
+                value={settings.language}
+                onChange={handleSettingsChange}
+              >
+                <option value="English">English</option>
+              </select>
+            </div>
+          </div>
+        ) : (
+          <div className="profile-overview-section">
+            <div className="profile-header">
+              <h2>Profile Overview</h2>
+              <button
+                className="profile-edit-button"
+                onClick={() => setEditMode(!editMode)}
+              >
+                {editMode ? "Cancel" : "Edit Profile"}
+              </button>
+            </div>
 
-              <form onSubmit={handleSubmit}>
-                <div className="profile-form-group">
+            <form onSubmit={handleSubmit}>
+              <div className="profile-form-group">
                 <label htmlFor="firstName">First Name</label>
                 <input
-                    id="firstName" // testing purposes
-                    type="text"
-                    name="firstName"
-                    value={userData.firstName}
-                    onChange={handleInputChange}
-                    disabled={!editMode}
-                  />
-                </div>
+                  id="firstName" // testing purposes
+                  type="text"
+                  name="firstName"
+                  value={userData.firstName}
+                  onChange={handleInputChange}
+                  disabled={!editMode}
+                />
+              </div>
 
-                <div className="profile-form-group">
+              <div className="profile-form-group">
                 <label htmlFor="lastName">Last Name</label>
                 <input
-                    id="lastName" // testing purposes
-                    type="text"
-                    name="lastName"
-                    value={userData.lastName}
-                    onChange={handleInputChange}
-                    disabled={!editMode}
-                  />
-                </div>
+                  id="lastName" // testing purposes
+                  type="text"
+                  name="lastName"
+                  value={userData.lastName}
+                  onChange={handleInputChange}
+                  disabled={!editMode}
+                />
+              </div>
 
-                <div className="profile-form-group">
+              <div className="profile-form-group">
                 <label htmlFor="email">Email</label>
                 <input
-                    id="email"
-                    type="email"
-                    name="email"
-                    value={userData.email}
-                    disabled
-                  />
-                </div>
+                  id="email"
+                  type="email"
+                  name="email"
+                  value={userData.email}
+                  disabled
+                />
+              </div>
 
-                <div className="profile-form-group">
+              <div className="profile-form-group">
                 <label htmlFor="phone">Phone</label>
                 <input
-                    id="phone" // testing purposes
-                    type="tel"
-                    name="phone"
-                    value={userData.phone}
-                    onChange={handleInputChange}
-                    disabled={!editMode}
-                  />
-                </div>
+                  id="phone" // testing purposes
+                  type="tel"
+                  name="phone"
+                  value={userData.phone}
+                  onChange={handleInputChange}
+                  disabled={!editMode}
+                />
+              </div>
 
-                {editMode && (
-                  <div className="profile-form-actions">
-                    <button type="submit" className="profile-save-button">
-                      Save Changes
-                    </button>
-                  </div>
-                )}
-              </form>
-            </div>
-          )}
-        </div>
+              {editMode && (
+                <div className="profile-form-actions">
+                  <button type="submit" className="profile-save-button">
+                    Save Changes
+                  </button>
+                </div>
+              )}
+            </form>
+          </div>
+        )}
       </div>
+    </div>
   );
 };
 

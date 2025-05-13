@@ -7,7 +7,7 @@ import Chatbot from "../Chatbot/Chatbot";
 
 const Layout = ({ children }) => {
   const location = useLocation();
-  const noChatbotPaths = ["/login", "/signup"];
+  const noChatbotPaths = ["/login", "/signup", "/forgotPassword"];
   const showChatbot = !noChatbotPaths.includes(location.pathname);
 
   return (

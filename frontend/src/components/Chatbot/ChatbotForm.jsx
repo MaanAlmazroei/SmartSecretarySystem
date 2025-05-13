@@ -1,23 +1,33 @@
-import {useRef} from 'react'
+import { useRef } from "react";
 
-const ChatbotForm = ({chatHistory,setChatHistory,generateBotResponse}) =>{
-    const inputRef = useRef();
-    const handleFormSubmit= (e)=>{
-        e.preventDefault();
-        const userMessage=inputRef.current.value.trim();
-        if(!userMessage) return;
-        inputRef.current.value="";
+const ChatbotForm = ({ chatHistory, setChatHistory, generateBotResponse }) => {
+  const inputRef = useRef();
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    const userMessage = inputRef.current.value.trim();
+    if (!userMessage) return;
+    inputRef.current.value = "";
 
-        //update chat history with the user's msg
-        setChatHistory((history) => [...history, { role: "user", text: userMessage }]);
+    //update chat history with the user's msg
+    setChatHistory((history) => [
+      ...history,
+      { role: "user", text: userMessage },
+    ]);
 
-         // Show "Thinking..." indicator after a short delay
-        setTimeout(() => {
-         // Add temporary "Thinking..." message
-        setChatHistory((history) => [...history, { role: "model", text: "Thinking..." }]);
-    
-        // Generate actual bot response (replace with your API call)
-        generateBotResponse([...chatHistory, { role: "user", text: `You are an intelligent and professional virtual assistant for the Smart Secretary System of the Faculty of Computing and Information Technology (FCIT) at King Abdulaziz University (KAU).
+    // Show "Thinking..." indicator after a short delay
+    setTimeout(() => {
+      // Add temporary "Thinking..." message
+      setChatHistory((history) => [
+        ...history,
+        { role: "model", text: "Thinking..." },
+      ]);
+
+      // Generate actual bot response (replace with your API call)
+      generateBotResponse([
+        ...chatHistory,
+        {
+          role: "user",
+          text: `You are an intelligent and professional virtual assistant for the Smart Secretary System of the Faculty of Computing and Information Technology (FCIT) at King Abdulaziz University (KAU).
 
 This system helps students, faculty, and staff handle academic and administrative services efficiently.
 
@@ -62,17 +72,23 @@ Example Valid Questions:
 
 "Where is the secretary’s office?"
 
-"How do I use ODUS Plus for course registration?" ${userMessage}` }]);
-            }, 600);
-};
-    
+"How do I use ODUS Plus for course registration?" ${userMessage}`,
+        },
+      ]);
+    }, 600);
+  };
 
-    return(
-        
-<form action="#" className="Chatbot-form" onSubmit={handleFormSubmit}>
-              <input type="text" ref={inputRef} placeholder="Message..." className='Chatbot-message-input' required />
-              <button className="Chatbot-send-button">Send</button>
-            </form>
-    )
-}
+  return (
+    <form action="#" className="Chatbot-form" onSubmit={handleFormSubmit}>
+      <input
+        type="text"
+        ref={inputRef}
+        placeholder="Message..."
+        className="Chatbot-message-input"
+        required
+      />
+      <button className="Chatbot-send-button">Send</button>
+    </form>
+  );
+};
 export default ChatbotForm;
